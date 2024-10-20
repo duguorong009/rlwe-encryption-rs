@@ -34,7 +34,13 @@ impl Sampling {
     }
 
     fn probability(&self, x: RR, sigma: RR, c: RR) -> RR {
-        todo!()
+        let mut s: RR = sigma * sqrt(2 * compute_pi_RR());
+        let mut over_s: RR = 1 / s;
+
+        if x == to_RR(0) {
+            return over_s;
+        }
+        over_s * exp(-(power((x - c) / sigma, 2)) / 2.0)
     }
 
     //  Method for computing the binary expansion of a given probability in [0, 1] 
@@ -45,7 +51,7 @@ impl Sampling {
         precision: u64,
         index: usize,
     ) {
-        RR mut pow = todo!(); 
+        let mut pow: RR = todo!(); 
         let i = -1;
         let j = 0;
 
