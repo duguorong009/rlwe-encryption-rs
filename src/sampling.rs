@@ -47,7 +47,9 @@ impl Sampling {
         todo!()
     }
 
+    // bit = 0 then return a
     fn select(a: i32, b: i32, bit: u32) -> i32 {
-        todo!()
+        let mask = -(bit as i32);
+        (mask & (a ^ b)) ^ a
     }
 }
