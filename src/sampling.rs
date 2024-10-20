@@ -12,7 +12,17 @@ pub struct Sampling {
 
 impl Sampling {
     pub fn new(precision: i32, tailcut: f32, sigma: RR, center: RR) -> Self {
-        todo!()
+        let sampling = Self {
+            p: vec![],
+            begin: vec![],
+            precision,
+            tailcut,
+            sigma,
+            c: center,
+        };
+        // RR::set_precision(precision as u64); 
+        sampling.build_probability_matrix();
+        sampling
     }
 
     pub fn knuth_yao(&self) -> i32 {
