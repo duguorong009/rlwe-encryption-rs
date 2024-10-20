@@ -37,14 +37,29 @@ impl Sampling {
         todo!()
     }
 
+    //  Method for computing the binary expansion of a given probability in [0, 1] 
     fn binary_expansion(
         &self,
-        aux_p: Vec<Vec<i32>>,
+        aux_p: &mut Vec<Vec<i32>>,
         probability: RR,
         precision: u64,
         index: usize,
     ) {
-        todo!()
+        RR mut pow = todo!(); 
+        let i = -1;
+        let j = 0;
+
+        while probability > 0 && j < precision {
+            pow = power2_RR(i); // 2 ^ {i}
+            if pow <= probability {
+                aux_p[j][index] = 1;
+                probability -= pow;
+            } else {
+                aux_p[j][index] = 0;
+            }
+            i -= 1;
+            j += 1;
+        }
     }
 
     // bit = 0 then return a
