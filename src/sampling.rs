@@ -22,7 +22,7 @@ impl Sampling {
             sigma,
             c: center,
         };
-        // RR::set_precision(precision as u64); 
+        // RR::set_precision(precision as u64);
         sampling.build_probability_matrix();
         sampling
     }
@@ -37,17 +37,22 @@ impl Sampling {
 
     fn probability(&self, x: Float, sigma: Float, c: Float) -> Float {
         let pi = Float::with_val(32, Constant::Pi);
-        let mut s: Float = sigma * (Float::with_val(32, 2) * pi).sqrt();
+        let mut s: Float = sigma.clone() * (Float::with_val(32, 2) * pi).sqrt();
         let mut over_s: Float = 1 / s;
 
         if x == 0 {
             return over_s;
         }
+
         // over_s * exp(-(power((x - c) / sigma, 2)) / 2.0)
-        todo!()
+        let tmp = (x - c) / sigma;
+        let tmp2 = tmp.clone() * tmp;
+        let tmp3 = -(tmp2 / Float::with_val(32, 2.0));
+        let tmp4 = tmp3.exp();
+        over_s * tmp4
     }
 
-    //  Method for computing the binary expansion of a given probability in [0, 1] 
+    //  Method for computing the binary expansion of a given probability in [0, 1]
     fn binary_expansion(
         &self,
         aux_p: &mut Vec<Vec<i32>>,
