@@ -27,8 +27,56 @@ impl Sampling {
         sampling
     }
 
+    // Knuth-Yao algorithm to obtain a sample from the discrete gaussian
     pub fn knuth_yao(&self) -> i32 {
-        todo!()
+        let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as usize;
+        let center = self.c.to_f32().round() as i32;
+        let  mut d = 0; // distance
+        let mut hit = 0;
+        // let signal = 1 - 2 * RandomBits_long(1); // Sample a random signal s
+        let signal = 1 - 2 * 0;
+        let invalid_sample = bound + 1;
+        let p_num_rows = self.p.len(); // precision
+        let p_num_cols = self.p[0].len();
+
+        let mut random_bits: Vec<i32> = vec![0; p_num_rows];
+
+        let length = 64; // sizeof(unsigned long)*8 // 64 bits
+
+        let mut index = 0;
+        for _ in 0..(p_num_rows / length + 1) {
+            let mut r: u64 = 0; // RandomWord(); // It returns a word filled with pseudo-random bits
+            let mut j = 0;
+            while j < length && index < p_num_rows {
+                random_bits[index] = (r & 1) as i32; // getting the least significant bit
+
+                j+= 1;
+                index += 1;
+                r = r >> 1;
+            }
+        }
+
+        let mut s = 0;
+        for row in 0..p_num_rows {
+            d = 2 * d + random_bits[row]; // Distance calculus
+            for col  in self.begin[row] as usize..p_num_cols {
+                d = d - self.p[row][col];
+                let mut enable = (d + 1) as i32; // "enable" turns 0 iff d = -1
+                enable = (1 ^ ((enable | -enable) >> 31)) & 1; // "enable" turns 1 iff "enable" was 0
+
+                // when enable & !hit becomes 1, "col" is added to "S";
+                // e.g. enable = 1 and hit = 0
+                s += Sampling::select(invalid_sample as i32, col as i32, (enable & !hit) as u32);
+                hit += (enable & hit) as i32;
+            }
+        }
+
+        // Note: the "col" value is in [0, bound]. So, the invalid sample must be greater than bound.
+        s = s % invalid_sample as i32;
+        s = s - bound as i32 + center;
+        s *= signal;
+
+        s
     }
 
     fn build_probability_matrix(&mut self) {
