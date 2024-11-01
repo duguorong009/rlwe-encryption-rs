@@ -1,4 +1,4 @@
-use rug::{float::Constant, ops::Pow, Float};
+use rug::{float::{Constant, Round}, ops::{DivAssignRound, Pow}, Float};
 
 pub const ROWS: usize = 128;
 pub const COLS: usize = 40;
@@ -14,7 +14,7 @@ pub struct Sampling {
 
 impl Sampling {
     pub fn new(precision: i32, tailcut: f32, sigma: Float, center: Float) -> Self {
-        let sampling = Self {
+        let mut sampling = Self {
             p: vec![],
             begin: vec![],
             precision,
@@ -31,8 +31,63 @@ impl Sampling {
         todo!()
     }
 
-    fn build_probability_matrix(&self) {
-        todo!()
+    fn build_probability_matrix(&mut self) {
+        // RR::set_precision(to_long(self.precision));
+
+        let mut aux_p: Vec<Vec<i32>> = vec![];
+        let mut aux_begin: Vec<i32> = vec![];
+
+        // The random variable consists of elements in [c-tailcut*sigma, c+tailcut*sigma]
+        let mut prob_of_x: Vec<Float> = vec![];
+
+        let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as usize;
+        prob_of_x.reserve_exact(bound + 1);
+        aux_p.reserve_exact(self.precision as usize);
+
+        for i in 0..aux_p.len() {
+            aux_p[i].reserve_exact(bound + 1);
+        }
+
+        for x in (1..=bound).rev() {
+            prob_of_x[bound - x] = self.probability(Float::with_val(32, x) + self.c.clone(), self.sigma.clone(), self.c.clone());
+        }
+
+        prob_of_x[bound] = self.probability(Float::with_val(32, 0) + self.c.clone(), self.sigma.clone(), self.c.clone());
+        prob_of_x[bound].div_assign_round(Float::with_val(32, 2), Round::Nearest);
+
+        let mut i = -1;
+        for j in 0..self.precision as usize {
+            let pow: Float = Float::with_val(32, 2).pow(i); // 2^{i}
+            i -= 1;
+            for x in (1..=bound).rev() {
+                aux_p[j][bound - x] = 0;
+                if prob_of_x[bound - x] >= pow.clone() {
+                    aux_p[j][bound - x] = 1;
+                    prob_of_x[bound - x] -= pow.clone();
+                }
+            }
+        }
+
+        self.p = aux_p;
+
+        let p_num_cols = self.p[0].len();
+        let p_num_rows = self.p.len();
+        
+        aux_begin.reserve_exact(p_num_rows);
+
+        // computing in which position the non-zero values in P start and end
+        for i in 0..p_num_rows {
+            aux_begin[i] = p_num_cols as i32 - 1;
+
+            for j in 0..p_num_cols {
+                if self.p[i][j] == 1 {
+                    aux_begin[i] = j as i32;
+                    break;
+                }
+            }
+        }
+
+        self.begin = aux_begin;
     }
 
     fn probability(&self, x: Float, sigma: Float, c: Float) -> Float {
