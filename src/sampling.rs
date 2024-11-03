@@ -3,6 +3,7 @@ use rug::{float::{Constant, Round}, ops::{DivAssignRound, Pow}, Float};
 pub const ROWS: usize = 128;
 pub const COLS: usize = 40;
 
+#[derive(Debug, Clone)]
 pub struct Sampling {
     p: Vec<Vec<i32>>,
     begin: Vec<i32>,

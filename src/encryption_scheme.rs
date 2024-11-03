@@ -2,6 +2,7 @@ use rug::{Float, Integer};
 
 use crate::{sampling::Sampling, util::ZZX};
 
+#[derive(Debug, Clone)]
 pub struct EncryptionScheme {
     /* Ring parameters */
     p: i32,
@@ -58,7 +59,7 @@ impl EncryptionScheme {
     }
 
     pub fn new_with_instance(orig: &EncryptionScheme) -> Self {
-        todo!("impl `EncryptionScheme(const EncryptionScheme& orig);` func");
+        orig.clone()
     }
 
     fn key_generation(a: &ZZX, r2: &ZZX, p1: &ZZX) {
