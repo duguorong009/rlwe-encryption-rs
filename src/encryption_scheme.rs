@@ -10,7 +10,7 @@ pub struct EncryptionScheme {
     f: ZZX,
 
     /* Knuth-Yao discrete Gaussian sampler parameters */
-    tail_cut: f32,
+    tailcut: f32,
     sigma: Float,
     center: Float,
 
@@ -22,8 +22,21 @@ impl EncryptionScheme {
         todo!("impl `void SetF()` func");
     }
 
-    fn poly_sampling(a: &ZZX) {
-        todo!("impl `void PolySampling(ZZX& a)` func");
+    fn poly_sampling(&self, a: &mut ZZX) {
+        // TODO: check if match c code 
+        // int bound = ((int)tailcut)*to_int(sigma);
+        // int center = to_int(center);
+        let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as i32;
+        let center = self.center.to_f32().round() as i32;
+
+        a.set_length(self.p as usize);
+        for i in 0..self.p as usize {
+            let mut sample = self.gauss.knuth_yao();
+            while (sample >= (center + bound)) || (sample <=(center - bound)) {
+                sample = self.gauss.knuth_yao();
+            }
+            a.set_coeff(i, Some(sample));
+        }
     }
 
     fn _Mod(a: &ZZX) {
@@ -36,7 +49,7 @@ impl EncryptionScheme {
 }
 
 impl EncryptionScheme {
-    pub fn new(p: i32, q: i32, preicsion: u64, tail_cut: f32, sigma: Float, center: Float) -> Self {
+    pub fn new(p: i32, q: i32, preicsion: u64, tailcut: f32, sigma: Float, center: Float) -> Self {
         // RR::SetPrecision(to_long(precision));
 
         let mut f = ZZX::new();
@@ -45,13 +58,13 @@ impl EncryptionScheme {
         f.set_coeff(1, Some(-1));
         f.set_coeff(0, Some(-1));
 
-        let gauss = Sampling::new(preicsion, tail_cut, sigma.clone(), center.clone());
+        let gauss = Sampling::new(preicsion, tailcut, sigma.clone(), center.clone());
 
         Self {
             p,
             q,
             f,
-            tail_cut,
+            tailcut,
             sigma,
             center,
             gauss,
