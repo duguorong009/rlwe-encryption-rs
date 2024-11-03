@@ -6,14 +6,14 @@ pub const COLS: usize = 40;
 pub struct Sampling {
     p: Vec<Vec<i32>>,
     begin: Vec<i32>,
-    precision: i32,
+    precision: u64,
     tailcut: f32,
     sigma: Float,
     c: Float,
 }
 
 impl Sampling {
-    pub fn new(precision: i32, tailcut: f32, sigma: Float, center: Float) -> Self {
+    pub fn new(precision: u64, tailcut: f32, sigma: Float, center: Float) -> Self {
         let mut sampling = Self {
             p: vec![],
             begin: vec![],

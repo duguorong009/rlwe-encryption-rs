@@ -36,7 +36,25 @@ impl EncryptionScheme {
 
 impl EncryptionScheme {
     pub fn new(p: i32, q: i32, preicsion: u64, tail_cut: f32, sigma: Float, center: Float) -> Self {
-        todo!("impl `EncryptionScheme(const int& p, const int& q, long precision, float tailcut, RR sigma, RR center);` func");
+        // RR::SetPrecision(to_long(precision));
+
+        let mut f = ZZX::new();
+        f.set_length(p as usize + 1);
+        f.set_coeff(p as usize, Some(1));
+        f.set_coeff(1, Some(-1));
+        f.set_coeff(0, Some(-1));
+
+        let gauss = Sampling::new(preicsion, tail_cut, sigma.clone(), center.clone());
+
+        Self {
+            p,
+            q,
+            f,
+            tail_cut,
+            sigma,
+            center,
+            gauss,
+        }
     }
 
     pub fn new_with_instance(orig: &EncryptionScheme) -> Self {

@@ -45,4 +45,7 @@ impl ZZX {
             self.coeffs[i].clone()
         }
     }
+    pub fn set_length(&mut self, len: usize) {
+        self.coeffs.resize(len, Integer::from(0));
+    }
 }
