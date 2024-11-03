@@ -39,12 +39,14 @@ impl EncryptionScheme {
         }
     }
 
-    fn _Mod(a: &ZZX) {
-        todo!("impl `void Mod(ZZX& a)` func");
+    fn _Mod(&self, a: &mut ZZX) {
+        for i in 0..self.p as usize {
+            a.set_coeff(i, Some(Self::_mod(a.coeff(i).clone(), self.q.into())));
+        }
     }
 
-    fn _mod(i: Integer, n: Integer) {
-        todo!("impl `inline ZZ mod(ZZ& i, IZZ& n)` func");
+    fn _mod(i: Integer, n: Integer) -> Integer {
+        (i % n.clone() + n.clone()) % n
     }
 }
 
