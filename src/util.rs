@@ -2,7 +2,7 @@ use rug::Integer;
 
 /// Custom clone of NTL::ZZX 
 #[derive(Clone, Debug, Default)]
-struct ZZX {
+pub struct ZZX {
     coeffs: Vec<Integer>,
 }
 
