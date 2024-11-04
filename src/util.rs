@@ -48,4 +48,34 @@ impl ZZX {
     pub fn set_length(&mut self, len: usize) {
         self.coeffs.resize(len, Integer::from(0));
     }
+
+    pub fn is_zero(&self) -> bool {
+        self.coeffs.is_empty()
+    }
+
+    pub fn lead_coeff(&self) -> Integer {
+        if self.is_zero() {
+            Integer::from(0)
+        } else {
+            self.coeffs[self.deg() as usize].clone()   
+        }
+    }
+}
+
+pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {    
+    if a.deg() >= f.deg() || b.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != *Integer::ONE {
+        panic!("MulMod: bad args");
+    }
+
+    let mut t = ZZX::new();
+    mul(&mut t, a, b);
+    rem(x, &t, f);
+}
+
+pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void Mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+}
+
+pub fn rem(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void Rem(ZZX& r, const ZZX& a, const ZZX& b)` func");
 }
