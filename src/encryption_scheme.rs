@@ -77,8 +77,20 @@ impl EncryptionScheme {
         orig.clone()
     }
 
-    fn key_generation(a: &ZZX, r2: &ZZX, p1: &ZZX) {
-        todo!("impl `void KeyGeneration(ZZX& a, ZZX& r2, ZZX& p1)` func");
+    fn key_generation(&self,a: &ZZX, r2: &mut ZZX, p1: &mut ZZX) {
+        let mut c: ZZX = ZZX::new();
+        let mut r1: ZZX = ZZX::new();
+
+        c.set_length(self.p as usize);
+        r1.set_length(self.p as usize);
+        
+        self.poly_sampling(&mut r1);
+        self.poly_sampling(r2);
+
+        // NTL::MulMod(c, a, r2, f);
+        // NTL::sub(p1, r1, c);
+
+        self._Mod(p1);
     }
 
     fn encode(aprime: &ZZX, a: Vec<i32>) {

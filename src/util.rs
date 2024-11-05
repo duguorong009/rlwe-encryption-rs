@@ -1,7 +1,9 @@
+use std::result;
+
 use rug::Integer;
 
 /// Custom clone of NTL::ZZX 
-#[derive(Clone, Debug, Default)]
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct ZZX {
     coeffs: Vec<Integer>,
 }
@@ -60,6 +62,25 @@ impl ZZX {
             self.coeffs[self.deg() as usize].clone()   
         }
     }
+
+    pub fn max_size(&self) -> u32 {
+        let mut res = 0;
+        for i in 0..self.coeffs.len() {
+            let t = self.coeffs[i].significant_bits();
+            if t > res {
+                res = t;
+            }
+        }
+        res
+    }
+
+    pub fn max_bits(&self) -> u32 {
+        let mut m = 0;
+        for i in 0..self.deg() as usize {
+            m = m.max(self.coeffs[i].significant_bits());
+        }
+        m
+    }
 }
 
 pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {    
@@ -73,9 +94,59 @@ pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {
 }
 
 pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    todo!("impl `void Mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+    if a.is_zero() || b.is_zero() {
+        c.set_length(0);
+        return;
+    }
+    if a == b {
+        sqr(c, a);
+        return;
+    }
+
+    let maxa: u32 = a.max_size(); // MaxSize(a)
+    let maxb: u32 = b.max_size(); // MaxSize(b)
+
+    let k = maxa.min(maxb);
+    let s = a.deg().min(b.deg()) + 1;
+   
+    // FIXME: I should have a way of setting all these crossovers
+    // automatically
+
+    if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
+        PlainMul(c, a, b);
+    } else if s < 80 || (k < 30 && s < 150) {
+        KarMul(c, a, b);
+    } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()){
+        SSMul(c, a, b);
+    } else {
+        HomMul(c, a, b);
+    }
 }
 
 pub fn rem(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     todo!("impl `void Rem(ZZX& r, const ZZX& a, const ZZX& b)` func");
+}
+
+fn sqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void Sqr(ZZX& c, const ZZX& a)` func");
+}
+
+fn PlainMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void PlainMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+}
+
+fn KarMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void KarMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+}
+
+fn SSMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void SSMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+}
+
+fn HomMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void HomMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+}
+
+fn choose_ss(a_deg: i64, a_max_bits: u32, b_deg: i64, b_max_bits: u32) -> bool {
+    todo!("impl `bool choose_ss(int a_deg, int a_max_bits, int b_deg, int b_max_bits)` func");
 }
