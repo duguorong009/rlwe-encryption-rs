@@ -128,7 +128,53 @@ pub fn rem(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 }
 
 fn sqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void Sqr(ZZX& c, const ZZX& a)` func");
+    // if (IsZero(a)) {
+    //     clear(c);
+    //     return;
+    //  }
+  
+    //  long maxa = MaxSize(a);
+  
+    //  long k = maxa;
+    //  long s = deg(a) + 1;
+  
+    //  if (s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || 
+    //                (k == 3 && s < 25) || (k == 4 && s < 10)) {
+  
+    //     PlainSqr(c, a);
+    //     return;
+    //  }
+  
+    //  if (s < 80 || (k < 30 && s < 150))  {
+    //     KarSqr(c, a);
+    //     return;
+    //  }
+  
+    //  if (ChooseSS(deg(a), MaxBits(a), deg(a), MaxBits(a))) {
+    //     SSSqr(c, a);
+    //  }
+    //  else {
+    //     HomSqr(c, a);
+    //  }
+
+    if a.is_zero() {
+        c.set_length(0);
+        return;
+    }
+
+    let maxa = a.max_size();
+    let k = maxa;
+    let s = a.deg() + 1;
+    
+    if s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || (k == 3 && s < 25) || (k == 4 && s < 10) {
+        PlainSqr(c, a);
+    } else if s < 80 || (k < 30 && s < 150) {
+        KarSqr(c, a);
+    } else if choose_ss(a.deg(), a.max_bits(), a.deg(), a.max_bits()) {
+        SSSqr(c, a);
+    } else {
+        HomSqr(c, a);
+    }
 }
 
 fn PlainMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
@@ -149,4 +195,20 @@ fn HomMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 
 fn choose_ss(a_deg: i64, a_max_bits: u32, b_deg: i64, b_max_bits: u32) -> bool {
     todo!("impl `bool choose_ss(int a_deg, int a_max_bits, int b_deg, int b_max_bits)` func");
+}
+
+fn PlainSqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void PlainSqr(ZZX& c, const ZZX& a)` func");
+}
+
+fn KarSqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void KarSqr(ZZX& c, const ZZX& a)` func");
+}
+
+fn SSSqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void SSSqr(ZZX& c, const ZZX& a)` func");
+}
+
+fn HomSqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void HomSqr(ZZX& c, const ZZX& a)` func");
 }
