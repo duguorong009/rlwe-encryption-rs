@@ -81,6 +81,14 @@ impl ZZX {
         }
         m
     }
+
+    pub fn normalize(&mut self) {
+        let mut i = self.coeffs.len() - 1;
+        while i > 0 && self.coeffs[i] == 0 {
+            self.coeffs.pop();
+            i -= 1;
+        }
+    }
 }
 
 pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {    
