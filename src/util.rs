@@ -117,18 +117,21 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     let k = maxa.min(maxb);
     let s = a.deg().min(b.deg()) + 1;
    
-    // FIXME: I should have a way of setting all these crossovers
-    // automatically
+    // // FIXME: I should have a way of setting all these crossovers
+    // // automatically
 
-    if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
-        PlainMul(c, a, b);
-    } else if s < 80 || (k < 30 && s < 150) {
-        KarMul(c, a, b);
-    } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()){
-        SSMul(c, a, b);
-    } else {
-        HomMul(c, a, b);
-    }
+    // if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
+    //     PlainMul(c, a, b);
+    // } else if s < 80 || (k < 30 && s < 150) {
+    //     KarMul(c, a, b);
+    // } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()){
+    //     SSMul(c, a, b);
+    // } else {
+    //     HomMul(c, a, b);
+    // }
+
+    // TODO: uncomment the above.
+    PlainMul(c, a, b);
 }
 
 pub fn rem(c: &mut ZZX, a: &ZZX, b: &ZZX) {
@@ -136,35 +139,6 @@ pub fn rem(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 }
 
 fn sqr(c: &mut ZZX, a: &ZZX) {
-    // if (IsZero(a)) {
-    //     clear(c);
-    //     return;
-    //  }
-  
-    //  long maxa = MaxSize(a);
-  
-    //  long k = maxa;
-    //  long s = deg(a) + 1;
-  
-    //  if (s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || 
-    //                (k == 3 && s < 25) || (k == 4 && s < 10)) {
-  
-    //     PlainSqr(c, a);
-    //     return;
-    //  }
-  
-    //  if (s < 80 || (k < 30 && s < 150))  {
-    //     KarSqr(c, a);
-    //     return;
-    //  }
-  
-    //  if (ChooseSS(deg(a), MaxBits(a), deg(a), MaxBits(a))) {
-    //     SSSqr(c, a);
-    //  }
-    //  else {
-    //     HomSqr(c, a);
-    //  }
-
     if a.is_zero() {
         c.set_length(0);
         return;
@@ -219,6 +193,24 @@ fn PlainMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 }
 
 fn KarMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    if a.is_zero() || b.is_zero() {
+        c.set_length(0);
+        return;
+    }
+
+    if a == b {
+        KarSqr(c, a);
+        return;
+    }
+
+    let sa = a.coeffs.len();
+    let sb = b.coeffs.len();
+
+    let ap = &a.coeffs;
+    let bp = &b.coeffs;
+
+    c.set_length(sa + sb - 1);
+
     todo!("impl `void KarMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
 }
 
