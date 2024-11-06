@@ -186,7 +186,36 @@ fn sqr(c: &mut ZZX, a: &ZZX) {
 }
 
 fn PlainMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    todo!("impl `void PlainMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+    if a == b {
+        PlainSqr(c, a);
+        return;
+    }
+
+    let da = a.deg();
+    let db = b.deg();
+
+    if da < 0 || db < 0 {
+        c.set_length(0);
+        return;
+    }
+
+    let d = da + db;
+    let ap: &Vec<Integer> = &a.coeffs;
+    let bp: &Vec<Integer> = &b.coeffs;
+
+    c.set_length(d as usize + 1);
+
+    for i in 0..=d {
+        let j_min = 0.max(i - db);
+        let j_max = da.min(i);
+        let mut accum = Integer::from(0);
+        for j in j_min..=j_max {
+            accum += ap[j as usize].clone() * bp[i as usize - j as usize].clone();
+        }
+        c.set_coeff(i as usize, Some(accum));
+    }
+
+    c.normalize();
 }
 
 fn KarMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
