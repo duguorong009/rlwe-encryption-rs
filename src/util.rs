@@ -230,7 +230,38 @@ fn choose_ss(a_deg: i64, a_max_bits: u32, b_deg: i64, b_max_bits: u32) -> bool {
 }
 
 fn PlainSqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void PlainSqr(ZZX& c, const ZZX& a)` func");
+    let da = a.deg();
+    if da < 0 {
+        c.set_length(0);
+        return;
+    }
+
+    let d = 2 * a.deg();
+    let ap = &a.coeffs;
+
+    c.set_length(d as usize + 1);
+
+    for i in 0..=d {
+        let j_min = 0.max(i - da);
+        let j_max = i.min(da);
+        let m = j_max - j_min + 1;
+        let m2 = m >> 1;
+        let j_max = j_min + m2 - 1;
+        
+        let mut accum = Integer::from(0);
+        let mut t = Integer::from(0);
+        for j in j_min..=j_max {
+            t = ap[j as usize].clone() * ap[i as usize - j as usize].clone();
+            accum += t;
+        }
+        accum *= 2;
+        if m & 1 == 1 {
+            t = ap[j_max as usize + 1].clone().square();
+            accum += t;
+        }
+        c.set_coeff(i as usize, Some(accum));
+    }
+    c.normalize();
 }
 
 fn KarSqr(c: &mut ZZX, a: &ZZX) {
