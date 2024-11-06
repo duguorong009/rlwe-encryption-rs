@@ -193,23 +193,23 @@ fn PlainMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 }
 
 fn KarMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    if a.is_zero() || b.is_zero() {
-        c.set_length(0);
-        return;
-    }
+    // if a.is_zero() || b.is_zero() {
+    //     c.set_length(0);
+    //     return;
+    // }
 
-    if a == b {
-        KarSqr(c, a);
-        return;
-    }
+    // if a == b {
+    //     KarSqr(c, a);
+    //     return;
+    // }
 
-    let sa = a.coeffs.len();
-    let sb = b.coeffs.len();
+    // let sa = a.coeffs.len();
+    // let sb = b.coeffs.len();
 
-    let ap = &a.coeffs;
-    let bp = &b.coeffs;
+    // let ap = &a.coeffs;
+    // let bp = &b.coeffs;
 
-    c.set_length(sa + sb - 1);
+    // c.set_length(sa + sb - 1);
 
     todo!("impl `void KarMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
 }
