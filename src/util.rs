@@ -148,15 +148,18 @@ fn sqr(c: &mut ZZX, a: &ZZX) {
     let k = maxa;
     let s = a.deg() + 1;
     
-    if s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || (k == 3 && s < 25) || (k == 4 && s < 10) {
-        PlainSqr(c, a);
-    } else if s < 80 || (k < 30 && s < 150) {
-        KarSqr(c, a);
-    } else if choose_ss(a.deg(), a.max_bits(), a.deg(), a.max_bits()) {
-        SSSqr(c, a);
-    } else {
-        HomSqr(c, a);
-    }
+    // if s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || (k == 3 && s < 25) || (k == 4 && s < 10) {
+    //     PlainSqr(c, a);
+    // } else if s < 80 || (k < 30 && s < 150) {
+    //     KarSqr(c, a);
+    // } else if choose_ss(a.deg(), a.max_bits(), a.deg(), a.max_bits()) {
+    //     SSSqr(c, a);
+    // } else {
+    //     HomSqr(c, a);
+    // }
+
+    // TODO: uncomment the above.
+    PlainSqr(c, a);
 }
 
 fn PlainMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
