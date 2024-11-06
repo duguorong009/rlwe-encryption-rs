@@ -1,5 +1,3 @@
-use std::result;
-
 use rug::Integer;
 
 /// Custom clone of NTL::ZZX 
@@ -13,12 +11,12 @@ impl ZZX {
         ZZX { coeffs: vec![] }
     }
 
-    pub fn new_with_u64(n: u64) -> Self {
-        ZZX { coeffs: vec![Integer::from(n)] }
+    pub fn new_with_val<T: Into<Integer>>(n: T) -> Self {
+        ZZX { coeffs: vec![n.into()] }
     }
 
-    pub fn new_with_integer(n: Integer) -> Self {
-        ZZX { coeffs: vec![n] }
+    pub fn new_with_vec(n: Vec<Integer>) -> Self {
+        ZZX { coeffs: n }
     }
 
     /*************************
