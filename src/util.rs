@@ -442,3 +442,84 @@ pub fn diff(a: &ZZX) -> ZZX {
     _diff(&mut x, a);
     x
 }
+
+// /// x = a^{-1} % X^m
+// fn _inv_trunc(x: &mut ZZX, a: &ZZX, m: i64) {
+//     if m < 0 {
+//         panic!("inv_trunc: m < 0");
+//     }
+
+//     if m == 0 {
+//         x.clear();
+//         return;
+//     }
+
+//     // TODO: add ntl overflow check `NTL_OVERFLOW(e, 1, 0)`
+
+//     newton_inv_trunc(x, a, m);
+// }
+
+// pub fn inv_trunc(a: &ZZX, m: i64) -> ZZX {
+//     let mut x = ZZX::new();
+//     _inv_trunc(&mut x, a, m);
+//     x
+// }
+
+// fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, m: i64) {
+//     let x = if a.const_term() == 1 {
+//         Integer::from(1)
+//     } else if a.const_term() == -1 {
+//         Integer::from(-1)
+//     } else {
+//         panic!("inv_trunc: non-invertible constant term");
+//     };
+
+//     if m == 1 {
+//         conv(c, x);
+//         return;
+//     }
+
+//     let mut _E = Vec::new();
+//     _E.push(m);
+//     let mut m = m;
+//     while m > 1 {
+//         m = (m + 1) / 2;
+//         _E.push(m);
+//     }
+
+//     let _L = _E.len();
+
+//     let mut g = ZZX::new();
+//     g.set_length(_E[0] as usize);
+
+//     let mut g0 = ZZX::new();
+//     g0.set_length(_E[0] as usize);
+
+//     let mut g1 = ZZX::new();
+//     g1.set_length(((3 * _E[0] + 1) / 2) as usize);
+
+//     let mut g2 = ZZX::new();
+//     g2.set_length(_E[0] as usize);
+
+//     conv(g, x);
+
+//     for i in (1.._L).rev() {
+//         // lift from _E[i] to _E[i - 1]
+//         let k = _E[i];
+//         let l = _E[i - 1] - _E[i];
+
+//         _trunc(&mut g0, a, (k + l) as usize);
+//         mul(&mut g1, &g0, &g);
+//         _right_shift(&mut g1, &g1, k);
+//         _trunc(&mut g, &g1, l as usize);
+
+//         mul(&mut g2, &g1, &g);
+//         _trunc(&mut g2, &g2, l as usize);
+//         _left_shift(&mut g2, &g2, k);
+
+//         sub(&mut g, &g, &g2);
+//     }
+
+//     c = g;
+
+// }
