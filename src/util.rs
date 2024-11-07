@@ -48,10 +48,11 @@ impl ZZX {
     /*************************
      * Some utility functions
      *************************/
+    /// degree of polynomial, note that zero polynomial has degree -1
     pub fn deg(&self) -> i64 {
         self.coeffs.len() as i64 - 1
     }
-
+    /// zero if i not in range
     pub fn coeff(&self, i: usize) -> Integer {
         if i >= self.coeffs.len() {
             Integer::from(0)
@@ -60,6 +61,7 @@ impl ZZX {
         }
     }
 
+    /// return coeff[i], or 0 if i not in range
     pub fn get_coeff(&self, i: usize) -> Integer {
         if i >= self.coeffs.len() {
             Integer::from(0)
@@ -68,20 +70,61 @@ impl ZZX {
         }
     }
 
-    pub fn set_coeff<T>(&mut self, i: usize, n: Option<T>) where T: Into<Integer> {
-        self.coeffs[i] = n.map(Into::into).unwrap_or(Integer::from(1));
-    }
-
-    pub fn is_zero(&self) -> bool {
-        self.coeffs.is_empty()
-    }
-
+    /// zero if poly is zero
     pub fn lead_coeff(&self) -> Integer {
         if self.is_zero() {
             Integer::from(0)
         } else {
             self.coeffs[self.deg() as usize].clone()   
         }
+    }
+
+    /// zero if poly is zero
+    pub fn const_term(&self) -> Integer {
+        if self.is_zero() {
+            Integer::from(0)
+        } else {
+            self.coeffs[0].clone()
+        }
+    }
+
+    // set coeff[i] = n or 1
+    pub fn set_coeff<T>(&mut self, i: usize, n: Option<T>) where T: Into<Integer> {
+        let m = self.deg();
+        if i > m as usize && self.is_zero() {
+            return;
+        }
+
+        if i > m as usize {
+            self.set_length(i + 1);
+        }
+        self.coeffs[i] = n.map(Into::into).unwrap_or(Integer::from(1));
+        
+        self.normalize();
+    }
+
+    /// set to the monomial X
+    pub fn set_x() -> Self {
+        let mut c = ZZX::new();
+        c.set_length(2);
+        c.set_coeff(1, Some(1));
+        c
+    }
+
+    pub fn is_zero(&self) -> bool {
+        self.coeffs.is_empty()
+    }
+
+    pub fn is_x(&self) -> bool {
+        self.deg() == 1 && self.coeffs[0] == 0 && self.coeffs[1] == 1
+    }
+
+    pub fn clear(&mut self) {
+        self.coeffs.clear();
+    }
+
+    pub fn set(&mut self) {
+        self.coeffs = vec![Integer::from(1)];
     }
 
     pub fn max_size(&self) -> u32 {
