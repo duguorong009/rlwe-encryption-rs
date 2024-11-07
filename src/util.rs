@@ -333,7 +333,7 @@ fn HomSqr(c: &mut ZZX, a: &ZZX) {
 }
 
 /// x = a % X^m
-fn trunc(x: &mut ZZX, a: &ZZX, m: usize) {
+fn _trunc(x: &mut ZZX, a: &ZZX, m: usize) {
     let n = m.min(a.coeffs.len());
     x.set_length(n);
 
@@ -342,3 +342,81 @@ fn trunc(x: &mut ZZX, a: &ZZX, m: usize) {
     }
     x.normalize();
 }
+
+pub fn trunc(a: &ZZX, m: usize) -> ZZX {
+    let mut x = ZZX::new();
+    _trunc(&mut x, a, m);
+    x
+}
+
+/// x = a / X^n
+fn _right_shift(x: &mut ZZX, a: &ZZX, n: i64) {
+    if a.is_zero() {
+        x.clear();
+        return;
+    }
+
+    if n < 0 {
+        // handle case n < -MAX_LONG
+        _left_shift(x, a, -n);
+        return;
+    }
+
+    let da = a.deg();
+    if da < n {
+        x.clear();
+        return;
+    }
+
+    let n = n as usize;
+    let da = da as usize;
+    
+    x.set_length(a.coeffs.len() - n);
+    
+    for i in 0..da - n {
+        x.coeffs[i] = a.coeffs[i + n].clone();
+    }
+
+    x.normalize();
+}
+
+pub fn right_shift(a: &ZZX, n: i64) -> ZZX {
+    let mut x = ZZX::new();
+    _right_shift(&mut x, a, n);
+    x
+}
+
+/// x = a * X^n
+fn _left_shift(x: &mut ZZX, a: &ZZX, n: i64) {
+    if a.is_zero() {
+        x.clear();
+        return;
+    }
+
+    if n < 0 {
+        // handle case n < -MAX_LONG
+        _right_shift(x, a, -n);
+        return;
+    }
+
+    let n = n as usize;
+    let m = a.coeffs.len();
+    x.set_length(m + n);
+    for i in (0..m).rev() {
+        x.coeffs[i + n] = a.coeffs[i].clone();
+    }
+    for i in 0..n {
+        x.coeffs[i] = Integer::from(0);
+    }
+    x.normalize();
+}
+
+pub fn left_shift(a: &ZZX, n: i64) -> ZZX {
+    let mut x = ZZX::new();
+    _left_shift(&mut x, a, n);
+    x
+}
+
+/* TODO: implement operators >>, <<, >>=, <<= with above shift funcs */
+
+
