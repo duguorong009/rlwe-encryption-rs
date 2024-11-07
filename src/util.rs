@@ -331,3 +331,14 @@ fn SSSqr(c: &mut ZZX, a: &ZZX) {
 fn HomSqr(c: &mut ZZX, a: &ZZX) {
     todo!("impl `void HomSqr(ZZX& c, const ZZX& a)` func");
 }
+
+/// x = a % X^m
+fn trunc(x: &mut ZZX, a: &ZZX, m: usize) {
+    let n = m.min(a.coeffs.len());
+    x.set_length(n);
+
+    for i in 0..n {
+        x.coeffs[i] = a.coeffs[i].clone();
+    }
+    x.normalize();
+}
