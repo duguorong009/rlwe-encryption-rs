@@ -419,4 +419,26 @@ pub fn left_shift(a: &ZZX, n: i64) -> ZZX {
 
 /* TODO: implement operators >>, <<, >>=, <<= with above shift funcs */
 
+/// x = derivative of a
+fn _diff(x: &mut ZZX, a: &ZZX) {
+    let n = a.deg();
+    if n <= 0 {
+        x.clear();
+        return;
+    }
 
+    x.set_length(n as usize);
+
+    for i in 0..n as usize {
+        x.coeffs[i] = a.coeffs[i + 1].clone() * (i + 1) as i64;
+    }
+    x.set_length(n as usize);
+
+    x.normalize();
+}
+
+pub fn diff(a: &ZZX) -> ZZX {
+    let mut x = ZZX::new();
+    _diff(&mut x, a);
+    x
+}
