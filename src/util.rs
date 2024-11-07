@@ -7,25 +7,47 @@ pub struct ZZX {
 }
 
 impl ZZX {
+    /************************
+     * Constructors, Assignment
+     ************************/
+    /// init 0
     pub fn new() -> Self {
         ZZX { coeffs: vec![] }
     }
 
+    /// init with single coefficient
     pub fn new_with_val<T: Into<Integer>>(n: T) -> Self {
         ZZX { coeffs: vec![n.into()] }
     }
 
-    pub fn new_with_vec(n: Vec<Integer>) -> Self {
-        ZZX { coeffs: n }
+    /// init with vector of coefficients
+    pub fn new_with_vec<T: Into<Integer>>(coeffs: Vec<T>) -> Self {
+        let coeffs = coeffs.into_iter().map(Into::into).collect();
+        ZZX { coeffs }
+    }
+
+    /// intial value 0, but space is pre-allocated for n coefficients
+    pub fn new_with_size(n: usize) -> Self {
+        let coeffs = Vec::with_capacity(n);
+        ZZX { coeffs }
+    }
+
+    /// Strip leading zeros
+    pub fn normalize(&mut self) {
+        let mut i = self.coeffs.len() - 1;
+        while i > 0 && self.coeffs[i] == 0 {
+            self.coeffs.pop();
+            i -= 1;
+        }
+    }
+
+    pub fn set_length(&mut self, len: usize) {
+        self.coeffs.resize(len, Integer::from(0));
     }
 
     /*************************
      * Some utility functions
      *************************/
-    pub fn set_coeff<T>(&mut self, i: usize, n: Option<T>) where T: Into<Integer> {
-        self.coeffs[i] = n.map(Into::into).unwrap_or(Integer::from(1));
-    }
-
     pub fn deg(&self) -> i64 {
         self.coeffs.len() as i64 - 1
     }
@@ -45,8 +67,9 @@ impl ZZX {
             self.coeffs[i].clone()
         }
     }
-    pub fn set_length(&mut self, len: usize) {
-        self.coeffs.resize(len, Integer::from(0));
+
+    pub fn set_coeff<T>(&mut self, i: usize, n: Option<T>) where T: Into<Integer> {
+        self.coeffs[i] = n.map(Into::into).unwrap_or(Integer::from(1));
     }
 
     pub fn is_zero(&self) -> bool {
@@ -78,14 +101,6 @@ impl ZZX {
             m = m.max(self.coeffs[i].significant_bits());
         }
         m
-    }
-
-    pub fn normalize(&mut self) {
-        let mut i = self.coeffs.len() - 1;
-        while i > 0 && self.coeffs[i] == 0 {
-            self.coeffs.pop();
-            i -= 1;
-        }
     }
 }
 
