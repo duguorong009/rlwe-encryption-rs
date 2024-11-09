@@ -1,4 +1,4 @@
-use rug::{Complete, Integer};
+use rug::{ops::Pow, Complete, Integer};
 
 /// Custom clone of NTL::ZZX
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -218,8 +218,8 @@ pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     } else {
         let mut r1 = ZZX::new();
         pseudo_rem(&mut r1, a, b);
-        power(m, b.lead_coeff(), da - db + 1);
-        if !divide(r, r1, m) {
+        let m = Integer::from(b.lead_coeff().pow(da as u32 - db as u32 + 1));
+        if !divide_with_integer(r, &r1, &m) {
             panic!("rem: remainder not defined over ZZ");
         }
     }
