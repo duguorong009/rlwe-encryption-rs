@@ -23,7 +23,7 @@ impl EncryptionScheme {
     }
 
     fn poly_sampling(&self, a: &mut ZZX) {
-        // TODO: check if match c code 
+        // TODO: check if match c code
         // int bound = ((int)tailcut)*to_int(sigma);
         // int center = to_int(center);
         let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as i32;
@@ -32,7 +32,7 @@ impl EncryptionScheme {
         a.set_length(self.p as usize);
         for i in 0..self.p as usize {
             let mut sample = self.gauss.knuth_yao();
-            while (sample >= (center + bound)) || (sample <=(center - bound)) {
+            while (sample >= (center + bound)) || (sample <= (center - bound)) {
                 sample = self.gauss.knuth_yao();
             }
             a.set_coeff(i, Some(sample));
@@ -77,13 +77,13 @@ impl EncryptionScheme {
         orig.clone()
     }
 
-    fn key_generation(&self,a: &ZZX, r2: &mut ZZX, p1: &mut ZZX) {
+    fn key_generation(&self, a: &ZZX, r2: &mut ZZX, p1: &mut ZZX) {
         let mut c: ZZX = ZZX::new();
         let mut r1: ZZX = ZZX::new();
 
         c.set_length(self.p as usize);
         r1.set_length(self.p as usize);
-        
+
         self.poly_sampling(&mut r1);
         self.poly_sampling(r2);
 

@@ -1,6 +1,6 @@
 use rug::Integer;
 
-/// Custom clone of NTL::ZZX 
+/// Custom clone of NTL::ZZX
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct ZZX {
     coeffs: Vec<Integer>,
@@ -17,7 +17,9 @@ impl ZZX {
 
     /// init with single coefficient
     pub fn new_with_val<T: Into<Integer>>(n: T) -> Self {
-        ZZX { coeffs: vec![n.into()] }
+        ZZX {
+            coeffs: vec![n.into()],
+        }
     }
 
     /// init with vector of coefficients
@@ -75,7 +77,7 @@ impl ZZX {
         if self.is_zero() {
             Integer::from(0)
         } else {
-            self.coeffs[self.deg() as usize].clone()   
+            self.coeffs[self.deg() as usize].clone()
         }
     }
 
@@ -89,7 +91,10 @@ impl ZZX {
     }
 
     // set coeff[i] = n or 1
-    pub fn set_coeff<T>(&mut self, i: usize, n: Option<T>) where T: Into<Integer> {
+    pub fn set_coeff<T>(&mut self, i: usize, n: Option<T>)
+    where
+        T: Into<Integer>,
+    {
         let m = self.deg();
         if i > m as usize && self.is_zero() {
             return;
@@ -99,7 +104,7 @@ impl ZZX {
             self.set_length(i + 1);
         }
         self.coeffs[i] = n.map(Into::into).unwrap_or(Integer::from(1));
-        
+
         self.normalize();
     }
 
@@ -147,7 +152,7 @@ impl ZZX {
     }
 }
 
-pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {    
+pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {
     if a.deg() >= f.deg() || b.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != *Integer::ONE {
         panic!("MulMod: bad args");
     }
@@ -172,7 +177,7 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 
     let k = maxa.min(maxb);
     let s = a.deg().min(b.deg()) + 1;
-   
+
     // // FIXME: I should have a way of setting all these crossovers
     // // automatically
 
@@ -190,8 +195,112 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     PlainMul(c, a, b);
 }
 
-pub fn rem(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    todo!("impl `void Rem(ZZX& r, const ZZX& a, const ZZX& b)` func");
+pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
+    let da = a.deg();
+    let db = b.deg();
+
+    if db < 0 {
+        panic!("rem: division by zero");
+    }
+
+    if da < db {
+        r.coeffs = a.coeffs.clone();
+    } else if db == 0 {
+        const_rem(r, a, b.const_term());
+    } else if b.lead_coeff() == 1 {
+        pseudo_rem(r, a, b);
+    } else if b.lead_coeff() == -1 {
+        let b1 = b.neg();
+        pseudo_rem(r, a, &b1);
+    } else if divide(a, b) {
+        r.coeffs = vec![Integer::from(0)];
+    } else {
+        let mut r1 = ZZX::new();
+        pseudo_rem(&mut r1, a, b);
+        power(m, b.lead_coeff(), da - db + 1);
+        if !divide(r, r1, m) {
+            panic!("rem: remainder not defined over ZZ");
+        }
+    }
+}
+
+fn const_rem(r: &mut ZZX, a: &ZZX, b: Integer) {
+    if b == 0 {
+        panic!("const_rem: division by zero");
+    }
+    r.coeffs = vec![Integer::from(0)];
+}
+
+fn pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
+    plain_pseudo_rem(r, a, b);
+}
+
+fn plain_pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
+    let mut q = ZZX::new();
+    plain_pseudo_div_rem(&mut q, r, a, b);
+}
+
+fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
+    let da = a.deg();
+    let db = b.deg();
+
+    if db < 0 {
+        panic!("pseudo_div_rem: division by zero");
+    }
+
+    if da < db {
+        r.coeffs = a.coeffs.clone();
+        q.clear();
+        return;
+    }
+
+    let bp = &b.coeffs;
+    let lc = bp[db as usize].clone();
+    let lc_is_one = lc == 1;
+
+    let mut xp = a.coeffs.clone();
+    let dq = da - db;
+
+    q.set_length(dq as usize + 1);
+    let mut qp = q.coeffs.clone();
+
+    if !lc_is_one {
+        let mut t = lc.clone();
+        for i in (0..=dq - 1).rev() {
+            xp[i as usize] = xp[i as usize].clone() * t.clone();
+            if i > 0 {
+                t = t * lc.clone();
+            }
+        }
+    }
+
+    for i in (0..=dq).rev() {
+        let t = xp[(i + db) as usize].clone();
+        qp[i as usize] = t.clone();
+        for j in (0..db).rev() {
+            let s = t.clone() * bp[j as usize].clone();
+            if !lc_is_one {
+                xp[i as usize + j as usize] = xp[i as usize + j as usize].clone() * lc.clone();
+            }
+            xp[i as usize + j as usize] = xp[i as usize + j as usize].clone() - s.clone();
+        }
+    }
+
+    if !lc_is_one {
+        let mut t = lc.clone();
+        for i in 1..=dq {
+            qp[i as usize] = qp[i as usize].clone() * t.clone();
+            if i < dq {
+                t = t.clone() * lc.clone();
+            }
+        }
+    }
+
+    r.set_length(db as usize);
+    for i in 0..db {
+        r.coeffs[i as usize] = xp[i as usize].clone();
+    }
+    r.normalize();
 }
 
 fn sqr(c: &mut ZZX, a: &ZZX) {
@@ -203,7 +312,7 @@ fn sqr(c: &mut ZZX, a: &ZZX) {
     let maxa = a.max_size();
     let k = maxa;
     let s = a.deg() + 1;
-    
+
     // if s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || (k == 3 && s < 25) || (k == 4 && s < 10) {
     //     PlainSqr(c, a);
     // } else if s < 80 || (k < 30 && s < 150) {
@@ -303,7 +412,7 @@ fn PlainSqr(c: &mut ZZX, a: &ZZX) {
         let m = j_max - j_min + 1;
         let m2 = m >> 1;
         let j_max = j_min + m2 - 1;
-        
+
         let mut accum = Integer::from(0);
         let mut t = Integer::from(0);
         for j in j_min..=j_max {
@@ -370,9 +479,9 @@ fn _right_shift(x: &mut ZZX, a: &ZZX, n: i64) {
 
     let n = n as usize;
     let da = da as usize;
-    
+
     x.set_length(a.coeffs.len() - n);
-    
+
     for i in 0..da - n {
         x.coeffs[i] = a.coeffs[i + n].clone();
     }

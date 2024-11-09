@@ -1,4 +1,8 @@
-use rug::{float::{Constant, Round}, ops::{DivAssignRound, Pow}, Float};
+use rug::{
+    float::{Constant, Round},
+    ops::{DivAssignRound, Pow},
+    Float,
+};
 
 pub const ROWS: usize = 128;
 pub const COLS: usize = 40;
@@ -32,7 +36,7 @@ impl Sampling {
     pub fn knuth_yao(&self) -> i32 {
         let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as usize;
         let center = self.c.to_f32().round() as i32;
-        let  mut d = 0; // distance
+        let mut d = 0; // distance
         let mut hit = 0;
         // let signal = 1 - 2 * RandomBits_long(1); // Sample a random signal s
         let signal = 1 - 2 * 0;
@@ -51,7 +55,7 @@ impl Sampling {
             while j < length && index < p_num_rows {
                 random_bits[index] = (r & 1) as i32; // getting the least significant bit
 
-                j+= 1;
+                j += 1;
                 index += 1;
                 r = r >> 1;
             }
@@ -60,7 +64,7 @@ impl Sampling {
         let mut s = 0;
         for row in 0..p_num_rows {
             d = 2 * d + random_bits[row]; // Distance calculus
-            for col  in self.begin[row] as usize..p_num_cols {
+            for col in self.begin[row] as usize..p_num_cols {
                 d = d - self.p[row][col];
                 let mut enable = (d + 1) as i32; // "enable" turns 0 iff d = -1
                 enable = (1 ^ ((enable | -enable) >> 31)) & 1; // "enable" turns 1 iff "enable" was 0
@@ -98,10 +102,18 @@ impl Sampling {
         }
 
         for x in (1..=bound).rev() {
-            prob_of_x[bound - x] = self.probability(Float::with_val(32, x) + self.c.clone(), self.sigma.clone(), self.c.clone());
+            prob_of_x[bound - x] = self.probability(
+                Float::with_val(32, x) + self.c.clone(),
+                self.sigma.clone(),
+                self.c.clone(),
+            );
         }
 
-        prob_of_x[bound] = self.probability(Float::with_val(32, 0) + self.c.clone(), self.sigma.clone(), self.c.clone());
+        prob_of_x[bound] = self.probability(
+            Float::with_val(32, 0) + self.c.clone(),
+            self.sigma.clone(),
+            self.c.clone(),
+        );
         prob_of_x[bound].div_assign_round(Float::with_val(32, 2), Round::Nearest);
 
         let mut i = -1;
@@ -121,7 +133,7 @@ impl Sampling {
 
         let p_num_cols = self.p[0].len();
         let p_num_rows = self.p.len();
-        
+
         aux_begin.reserve_exact(p_num_rows);
 
         // computing in which position the non-zero values in P start and end
