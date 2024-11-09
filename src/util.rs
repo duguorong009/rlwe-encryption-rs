@@ -303,6 +303,104 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
     r.normalize();
 }
 
+fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
+    let da = a.deg();
+    let db = b.deg();
+
+    if db <= 8 || da - db <= 8 {
+        plain_divide(q, a, b)
+    } else {
+        hom_divide(q, a, b)
+    }
+}
+
+fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
+    if bb.is_zero() {
+        if aa.is_zero() {
+            qq.clear();
+            return true; // 1
+        } else {
+            return false; // 0
+        }
+    }
+
+    if bb.deg() == 0 {
+        divide(qq, aa, bb.const_term())
+    }
+
+
+    let da = aa.deg();
+    let db = bb.deg();
+
+    if da < db {
+        return false;  // 0
+    }
+
+    let mut ca = Integer::from(0);
+    let mut cb = Integer::from(0);
+    content(&mut ca, aa);
+    content(&mut cb, bb);
+
+    if !divide(cq, ca, cb) {
+        return false; // 0
+    }
+
+    let mut a = ZZX::new();
+    let mut b = ZZX::new();
+    divide(&mut a, aa, bb);
+    divide(&mut b, bb, cb);
+
+    if !divide(a.lead_coeff(), b.lead_coeff()) {
+        return false; // 0
+    }
+
+    if !divide(a.const_term(), b.const_term()) {
+        return false; // 0
+    }
+
+    let coeff_bnd = a.max_bits() + ((da + 1).num_bits() + 1)/2  + (da - db);
+
+    let mut bp = b.coeffs.clone();
+    let lc = bp[db as usize].clone();
+
+    let lc_is_one = lc == 1;
+
+    let mut xp = a.coeffs.clone();
+
+    let dq = da - db;
+    let mut q = ZZX::new();
+    q.set_length(dq as usize + 1);
+    
+    for i in (0..=dq).rev() {
+        if !lc_is_one {
+            if !divide(t, xp[i + db], lc) {
+                return 0;
+            }
+        } else {
+            t = xp[i + db].clone();
+        }
+
+        if t.num_bits() > coeff_bnd {
+            return 0;
+        }
+
+        q.coeffs[i as usize] = t.clone();
+        for j in (0..db).rev() {
+            s = t.clone() * bp[j as usize].clone();
+            xp[i as usize + j as usize] = xp[i as usize + j as usize].clone() - s.clone();
+        }
+    }
+
+    for i in 0..db {
+        if !xp[i].is_zero() {
+            return 0;
+        }
+    }
+
+    mul(qq, q, cq);
+    return 1;
+}
+
 fn sqr(c: &mut ZZX, a: &ZZX) {
     if a.is_zero() {
         c.set_length(0);
