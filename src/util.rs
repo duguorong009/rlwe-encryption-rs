@@ -210,9 +210,10 @@ pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     } else if b.lead_coeff() == 1 {
         pseudo_rem(r, a, b);
     } else if b.lead_coeff() == -1 {
-        let b1 = b.neg();
+        let mut b1 = ZZX::new();
+        negate(&mut b1, b);
         pseudo_rem(r, a, &b1);
-    } else if divide(a, b) {
+    } else if divide_(a, b) {
         r.coeffs = vec![Integer::from(0)];
     } else {
         let mut r1 = ZZX::new();
@@ -314,6 +315,17 @@ fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
     }
 }
 
+fn divide_(a: &ZZX, b: &ZZX) -> bool {
+    let da = a.deg();
+    let db = b.deg();
+    
+    if db <= 8 || da - db <= 8 {
+        plain_divide_(a, b)
+    } else {
+        hom_divide_(a, b)
+    }
+}
+
 fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
     if bb.is_zero() {
         if aa.is_zero() {
@@ -405,6 +417,15 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
     return true;
 }
 
+fn plain_divide_(a: &ZZX, b: &ZZX) -> bool {
+    if b.deg() == 0 {
+        return divide_(a, b);
+    } else {
+        let mut q = ZZX::new();
+        return plain_divide(&mut q, a, b);
+    }
+}
+
 fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
     if b == &0 {
         if a.is_zero() {
@@ -439,6 +460,24 @@ fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
     return true;
 }
 
+fn divide_with_integer_(a: &ZZX, b: &Integer) -> bool {
+    if b == &0 {
+        return a.is_zero();
+    }
+    if b == &1 || b == &-1 {
+        return true;
+    }
+
+    let n = a.coeffs.len();
+    for i in 0..n {
+        if !a.coeffs[i].is_divisible(b) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 fn mul_with_integer(x: &mut ZZX, a: &ZZX, b: &Integer) {
     if b == &0 {
         x.clear();
@@ -451,6 +490,65 @@ fn mul_with_integer(x: &mut ZZX, a: &ZZX, b: &Integer) {
 
     for i in 0..da + 1 {
         x.coeffs[i as usize] = Integer::from(&a.coeffs[i as usize] * &t);
+    }
+}
+
+fn hom_divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
+    if b.is_zero() {
+        if a.is_zero() {
+            q.clear();
+            return true; // 1
+        } else {
+            return false; // 0
+        }
+    }
+
+    if a.is_zero() {
+        q.clear();
+        return true; // 1
+    }
+
+    if b.deg() == 0 {
+        return divide_with_integer(q, a, &b.const_term());
+    }
+
+    if a.deg() < b.deg() {
+        return false; // 0
+    }
+
+    let mut ca = Integer::new();
+    let mut cb = Integer::new();
+    content(&mut ca, a);
+    content(&mut cb, b);
+
+    let (cq, r) = ca.div_rem_ref(&cb).complete();
+    if !r.is_zero() {
+        return false; // 0
+    }
+
+    let mut aa = ZZX::new();
+    let mut bb = ZZX::new();
+    divide_with_integer(&mut aa, a, &ca);
+    divide_with_integer(&mut bb, b, &cb);
+
+    if !aa.lead_coeff().is_divisible(&bb.lead_coeff()) {
+        return false; // 0
+    }
+
+    if !aa.const_term().is_divisible(&bb.const_term()) {
+        return false; // 0
+    }
+
+    todo!()
+
+}
+
+fn hom_divide_(a: &ZZX, b: &ZZX) -> bool {
+    if b.deg() == 0 {
+        return divide_with_integer_(a, &b.const_term());
+    } else {
+        let mut q = ZZX::new();
+        return hom_divide(&mut q, a, b);
     }
 }
 
