@@ -308,11 +308,14 @@ fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
     let da = a.deg();
     let db = b.deg();
 
-    if db <= 8 || da - db <= 8 {
-        plain_divide(q, a, b)
-    } else {
-        hom_divide(q, a, b)
-    }
+    // if db <= 8 || da - db <= 8 {
+    //     plain_divide(q, a, b)
+    // } else {
+    //     hom_divide(q, a, b)
+    // }
+
+    // TODO: uncomment the above.
+    plain_divide(q, a, b)
 }
 
 fn divide_(a: &ZZX, b: &ZZX) -> bool {
@@ -374,7 +377,7 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
         + ((Integer::from(da + 1).significant_bits() + 1) / 2) as i64
         + (da - db);
 
-    let mut bp = b.coeffs.clone();
+    let bp = b.coeffs.clone();
     let lc = bp[db as usize].clone();
 
     let lc_is_one = lc == 1;
