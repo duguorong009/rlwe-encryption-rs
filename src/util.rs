@@ -270,7 +270,7 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
         for i in (0..=dq - 1).rev() {
             xp[i as usize] = xp[i as usize].clone() * t.clone();
             if i > 0 {
-                t = t * lc.clone();
+                t = Integer::from(&t * &lc);
             }
         }
     }
@@ -415,15 +415,15 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
     }
 
     mul_with_integer(qq, &q, &cq);
-    return true;
+    true
 }
 
 fn plain_divide_(a: &ZZX, b: &ZZX) -> bool {
     if b.deg() == 0 {
-        return divide_(a, b);
+        divide_(a, b)
     } else {
         let mut q = ZZX::new();
-        return plain_divide(&mut q, a, b);
+        plain_divide(&mut q, a, b)
     }
 }
 
@@ -458,7 +458,7 @@ fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
     }
 
     q.coeffs = res;
-    return true;
+    true
 }
 
 fn divide_with_integer_(a: &ZZX, b: &Integer) -> bool {
@@ -476,7 +476,7 @@ fn divide_with_integer_(a: &ZZX, b: &Integer) -> bool {
         }
     }
 
-    return true;
+    true
 }
 
 fn mul_with_integer(x: &mut ZZX, a: &ZZX, b: &Integer) {
@@ -545,10 +545,10 @@ fn hom_divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
 
 fn hom_divide_(a: &ZZX, b: &ZZX) -> bool {
     if b.deg() == 0 {
-        return divide_with_integer_(a, &b.const_term());
+        divide_with_integer_(a, &b.const_term())
     } else {
         let mut q = ZZX::new();
-        return hom_divide(&mut q, a, b);
+        hom_divide(&mut q, a, b)
     }
 }
 
