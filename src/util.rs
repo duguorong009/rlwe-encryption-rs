@@ -1,3 +1,5 @@
+use std::backtrace;
+
 use rug::{ops::Pow, Complete, Integer};
 
 /// Custom clone of NTL::ZZX
@@ -823,6 +825,30 @@ pub fn diff(a: &ZZX) -> ZZX {
     let mut x = ZZX::new();
     _diff(&mut x, a);
     x
+}
+
+pub fn sub(x: &mut ZZX, a: &ZZX, b: &ZZX) {
+    let da = a.deg();
+    let db = b.deg();
+    let maxab = da.max(db);
+
+    x.set_length(maxab as usize + 1);
+
+    for i in 0..maxab as usize + 1 {
+        let a = if i <= da as usize {
+            a.coeffs[i].clone()
+        } else {
+            Integer::from(0)
+        };
+        let b = if i <= db as usize {
+            b.coeffs[i].clone()
+        } else {
+            Integer::from(0)
+        };
+        x.coeffs[i] = a - b;
+    }
+
+    x.normalize();
 }
 
 // /// x = a^{-1} % X^m
