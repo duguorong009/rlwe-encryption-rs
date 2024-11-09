@@ -1,4 +1,4 @@
-use rug::Integer;
+use rug::{Complete, Integer};
 
 /// Custom clone of NTL::ZZX
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -341,24 +341,25 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
     content(&mut ca, aa);
     content(&mut cb, bb);
 
-    if !divide(cq, ca, cb) {
+    let (cq, r) = ca.div_rem_ref(&cb).complete();
+    if !r.is_zero() {
         return false; // 0
     }
 
     let mut a = ZZX::new();
     let mut b = ZZX::new();
     divide(&mut a, aa, bb);
-    divide(&mut b, bb, cb);
+    divide_with_integer(&mut b, bb, &cb);
 
-    if !divide(a.lead_coeff(), b.lead_coeff()) {
+    if !a.lead_coeff().is_divisible(&b.lead_coeff()) {
         return false; // 0
     }
 
-    if !divide(a.const_term(), b.const_term()) {
+    if !a.const_term().is_divisible(&b.const_term()) {
         return false; // 0
     }
 
-    let coeff_bnd = a.max_bits() + ((da + 1).num_bits() + 1)/2  + (da - db);
+    let coeff_bnd = a.max_bits() as i64 + ((Integer::from(da + 1).significant_bits() + 1) / 2) as i64  + (da - db);
 
     let mut bp = b.coeffs.clone();
     let lc = bp[db as usize].clone();
@@ -370,35 +371,38 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
     let dq = da - db;
     let mut q = ZZX::new();
     q.set_length(dq as usize + 1);
-    
+
+    let mut t = Integer::new();
     for i in (0..=dq).rev() {
         if !lc_is_one {
-            if !divide(t, xp[i + db], lc) {
-                return 0;
+            let (q, r) = &xp[i as usize + db as usize].div_rem_ref(&lc).complete();
+            t = q.clone();
+            if !r.is_zero() {
+                return false;
             }
         } else {
-            t = xp[i + db].clone();
+            t = xp[i as usize + db as usize].clone();
         }
 
-        if t.num_bits() > coeff_bnd {
-            return 0;
+        if t.significant_bits() as i64 > coeff_bnd {
+            return false;
         }
 
         q.coeffs[i as usize] = t.clone();
         for j in (0..db).rev() {
-            s = t.clone() * bp[j as usize].clone();
-            xp[i as usize + j as usize] = xp[i as usize + j as usize].clone() - s.clone();
+            let s = Integer::from(&t * &bp[j as usize]);
+            xp[i as usize + j as usize] = Integer::from(&xp[i as usize + j as usize] - &s);
         }
     }
 
     for i in 0..db {
-        if !xp[i].is_zero() {
-            return 0;
+        if !xp[i as usize].is_zero() {
+            return false;
         }
     }
 
-    mul(qq, q, cq);
-    return 1;
+    mul_with_integer(qq, &q, &cq);
+    return true;
 }
 
 fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
@@ -433,6 +437,21 @@ fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
 
     q.coeffs = res;
     return true;
+}
+
+fn mul_with_integer(x: &mut ZZX, a: &ZZX, b: &Integer) {
+    if b == &0 {
+        x.clear();
+        return;
+    }
+
+    let t = b.clone();
+    let da = a.deg();
+    x.set_length(da as usize + 1);
+
+    for i in 0..da + 1 {
+        x.coeffs[i as usize] = Integer::from(&a.coeffs[i as usize] * &t);
+    }
 }
 
 fn negate(q: &mut ZZX, a: &ZZX) {
