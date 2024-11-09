@@ -325,7 +325,7 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
     }
 
     if bb.deg() == 0 {
-        divide(qq, aa, bb.const_term())
+        return divide_with_integer(qq, aa, &bb.const_term());
     }
 
 
@@ -399,6 +399,47 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
 
     mul(qq, q, cq);
     return 1;
+}
+
+fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
+    if b == &0 {
+        if a.is_zero() {
+            q.clear();
+            return true; // 1
+        } else {
+            return false; // 0
+        }
+    }
+
+    if b == &1 {
+        q.coeffs = a.coeffs.clone();
+        return true; // 1
+    }
+
+    if b == &-1 {
+        negate(q, a);
+        return true; // 1
+    }
+
+    let n = a.coeffs.len();
+    let mut res: Vec<Integer> = Vec::with_capacity(n);
+    for i in 0..n {
+        let (q, r) = a.coeffs[i].clone().div_rem(b.clone());
+        if !r.is_zero() {
+            return false;
+        }
+        res[i] = q;
+    }
+
+    q.coeffs = res;
+    return true;
+}
+
+fn negate(q: &mut ZZX, a: &ZZX) {
+    q.coeffs = a.coeffs.clone();
+    for i in 0..q.coeffs.len() {
+        q.coeffs[i] = -q.coeffs[i].clone();
+    }
 }
 
 fn sqr(c: &mut ZZX, a: &ZZX) {
