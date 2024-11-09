@@ -442,6 +442,20 @@ fn negate(q: &mut ZZX, a: &ZZX) {
     }
 }
 
+fn content(c: &mut Integer, f: &ZZX) {
+    let mut res = Integer::from(0);
+    for i in 0..f.coeffs.len() {
+        res = res.gcd(&f.coeffs[i]);
+        if res == 1 {
+            break;
+        }
+    }
+    if f.lead_coeff().is_negative() {
+        res = -res;
+    }
+    *c = res;
+}
+
 fn sqr(c: &mut ZZX, a: &ZZX) {
     if a.is_zero() {
         c.set_length(0);
