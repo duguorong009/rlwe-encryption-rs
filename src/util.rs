@@ -1,4 +1,4 @@
-use std::ops::{Index, IndexMut, Shl, Shr};
+use std::ops::{Add, AddAssign, Index, IndexMut, Shl, Shr, Sub};
 
 use rug::{ops::{NegAssign, Pow}, Complete, Integer};
 
@@ -918,6 +918,26 @@ fn negate(q: &mut ZZX, a: &ZZX) {
     q.coeffs = a.coeffs.clone();
     for i in 0..q.coeffs.len() {
         q.coeffs[i].neg_assign();
+    }
+}
+
+impl Add for ZZX {
+    type Output = ZZX;
+
+    fn add(self, rhs: Self) -> Self::Output {
+        let mut output = ZZX::new();
+        add(&mut output, &self, &rhs);
+        output
+    }   
+}
+
+impl Sub for ZZX {
+    type Output = ZZX;
+
+    fn sub(self, rhs: Self) -> Self::Output {
+        let mut output = ZZX::new();
+        sub(&mut output, &self, &rhs);
+        output
     }
 }
 
