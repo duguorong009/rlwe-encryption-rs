@@ -1,5 +1,3 @@
-use std::backtrace;
-
 use rug::{ops::Pow, Complete, Integer};
 
 /// Custom clone of NTL::ZZX

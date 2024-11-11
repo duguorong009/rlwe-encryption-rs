@@ -39,7 +39,7 @@ impl Sampling {
         let mut d = 0; // distance
         let mut hit = 0;
         // let signal = 1 - 2 * RandomBits_long(1); // Sample a random signal s
-        let signal = 1 - 2 * 0;
+        let signal = 1 - 2 * 1;
         let invalid_sample = bound + 1;
         let p_num_rows = self.p.len(); // precision
         let p_num_cols = self.p[0].len();
