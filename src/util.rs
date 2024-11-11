@@ -1,4 +1,4 @@
-use std::ops::{Index, IndexMut};
+use std::ops::{Index, IndexMut, Shl, Shr};
 
 use rug::{ops::Pow, Complete, Integer};
 
@@ -119,8 +119,7 @@ impl ZZX {
     /// set to the monomial X
     pub fn set_x() -> Self {
         let mut c = ZZX::new();
-        c.set_length(2);
-        c.set_coeff(1, Some(1));
+        c.set_coeff::<i64>(1, None);
         c
     }
 
@@ -143,10 +142,7 @@ impl ZZX {
     pub fn max_size(&self) -> u32 {
         let mut res = 0;
         for i in 0..self.coeffs.len() {
-            let t = self.coeffs[i].significant_bits();
-            if t > res {
-                res = t;
-            }
+            res = res.max(self.coeffs[i].significant_bits());
         }
         res
     }
@@ -830,7 +826,21 @@ pub fn left_shift(a: &ZZX, n: i64) -> ZZX {
     x
 }
 
-/* TODO: implement operators >>, <<, >>=, <<= with above shift funcs */
+impl Shl<i64> for ZZX {
+    type Output = ZZX;
+
+    fn shl(self, shift: i64) -> Self::Output {
+        left_shift(&self, shift)
+    }
+}
+
+impl Shr<i64> for ZZX {
+    type Output = ZZX;
+
+    fn shr(self, shift: i64) -> Self::Output {
+        right_shift(&self, shift)
+    }
+}
 
 /// x = derivative of a
 fn _diff(x: &mut ZZX, a: &ZZX) {
