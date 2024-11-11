@@ -47,6 +47,12 @@ impl ZZX {
         self.coeffs.resize(len, Integer::from(0));
     }
 
+    pub fn set_max_length(&mut self, len: usize) {
+        if self.coeffs.len() < len {
+            self.coeffs.reserve_exact(len - self.coeffs.len());
+        }
+    }
+
     /*************************
      * Some utility functions
      *************************/
