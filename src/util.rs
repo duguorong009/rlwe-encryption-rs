@@ -1,3 +1,5 @@
+use std::ops::{Index, IndexMut};
+
 use rug::{ops::Pow, Complete, Integer};
 
 /// Custom clone of NTL::ZZX
@@ -157,6 +159,29 @@ impl ZZX {
         m
     }
 }
+
+impl Index<usize> for ZZX {
+    type Output = Integer;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        if index >= self.coeffs.len() {
+            panic!("index out of range");
+        } else {
+            &self.coeffs[index]
+        }
+    }
+}
+
+impl IndexMut<usize> for ZZX {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        if index >= self.coeffs.len() {
+            self.set_length(index + 1);
+        }
+        
+        &mut self.coeffs[index]
+    }
+}
+
 
 pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {
     if a.deg() >= f.deg() || b.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != *Integer::ONE {
