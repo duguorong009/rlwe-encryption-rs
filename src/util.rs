@@ -123,10 +123,6 @@ impl ZZX {
         c
     }
 
-    pub fn is_zero(&self) -> bool {
-        self.coeffs.is_empty()
-    }
-
     pub fn is_x(&self) -> bool {
         self.deg() == 1 && self.coeffs[0] == 0 && self.coeffs[1] == 1
     }
@@ -153,6 +149,17 @@ impl ZZX {
             m = m.max(self.coeffs[i].significant_bits());
         }
         m
+    }
+
+    /*************************
+     * Comparison functions
+     *************************/
+    pub fn is_zero(&self) -> bool {
+        self.coeffs.is_empty()
+    }
+
+    pub fn is_one(&self) -> bool {
+        self.coeffs.len() == 1 && self.coeffs[0] == 1
     }
 }
 
