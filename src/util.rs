@@ -1,6 +1,6 @@
 use std::ops::{Index, IndexMut, Shl, Shr};
 
-use rug::{ops::Pow, Complete, Integer};
+use rug::{ops::{NegAssign, Pow}, Complete, Integer};
 
 /// Custom clone of NTL::ZZX
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -589,13 +589,6 @@ fn hom_divide_(a: &ZZX, b: &ZZX) -> bool {
     }
 }
 
-fn negate(q: &mut ZZX, a: &ZZX) {
-    q.coeffs = a.coeffs.clone();
-    for i in 0..q.coeffs.len() {
-        q.coeffs[i] = -q.coeffs[i].clone();
-    }
-}
-
 fn content(c: &mut Integer, f: &ZZX) {
     let mut res = Integer::from(0);
     for i in 0..f.coeffs.len() {
@@ -919,6 +912,13 @@ pub fn sub(x: &mut ZZX, a: &ZZX, b: &ZZX) {
     }
 
     x.normalize();
+}
+
+fn negate(q: &mut ZZX, a: &ZZX) {
+    q.coeffs = a.coeffs.clone();
+    for i in 0..q.coeffs.len() {
+        q.coeffs[i].neg_assign();
+    }
 }
 
 // /// x = a^{-1} % X^m
