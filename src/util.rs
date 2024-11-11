@@ -1,6 +1,9 @@
 use std::ops::{Add, AddAssign, Index, IndexMut, Shl, Shr, Sub};
 
-use rug::{ops::{NegAssign, Pow}, Complete, Integer};
+use rug::{
+    ops::{NegAssign, Pow},
+    Complete, Integer,
+};
 
 /// Custom clone of NTL::ZZX
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -180,11 +183,10 @@ impl IndexMut<usize> for ZZX {
         if index >= self.coeffs.len() {
             self.set_length(index + 1);
         }
-        
+
         &mut self.coeffs[index]
     }
 }
-
 
 pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {
     if a.deg() >= f.deg() || b.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != *Integer::ONE {
@@ -216,7 +218,7 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     // // automatically
 
     // if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
-    //     PlainMul(c, a, b);
+    //     plain_mul(c, a, b);
     // } else if s < 80 || (k < 30 && s < 150) {
     //     KarMul(c, a, b);
     // } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()){
@@ -226,7 +228,7 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     // }
 
     // TODO: uncomment the above.
-    PlainMul(c, a, b);
+    plain_mul(c, a, b);
 }
 
 pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
@@ -614,22 +616,22 @@ fn sqr(c: &mut ZZX, a: &ZZX) {
     let s = a.deg() + 1;
 
     // if s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || (k == 3 && s < 25) || (k == 4 && s < 10) {
-    //     PlainSqr(c, a);
+    //     plain_sqr(c, a);
     // } else if s < 80 || (k < 30 && s < 150) {
-    //     KarSqr(c, a);
+    //     kar_sqr(c, a);
     // } else if choose_ss(a.deg(), a.max_bits(), a.deg(), a.max_bits()) {
-    //     SSSqr(c, a);
+    //     ss_sqr(c, a);
     // } else {
-    //     HomSqr(c, a);
+    //     hom_sqr(c, a);
     // }
 
     // TODO: uncomment the above.
-    PlainSqr(c, a);
+    plain_sqr(c, a);
 }
 
-fn PlainMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+fn plain_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     if a == b {
-        PlainSqr(c, a);
+        plain_sqr(c, a);
         return;
     }
 
@@ -667,7 +669,7 @@ fn KarMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     // }
 
     // if a == b {
-    //     KarSqr(c, a);
+    //     kar_sqr(c, a);
     //     return;
     // }
 
@@ -694,7 +696,7 @@ fn choose_ss(a_deg: i64, a_max_bits: u32, b_deg: i64, b_max_bits: u32) -> bool {
     todo!("impl `bool choose_ss(int a_deg, int a_max_bits, int b_deg, int b_max_bits)` func");
 }
 
-fn PlainSqr(c: &mut ZZX, a: &ZZX) {
+fn plain_sqr(c: &mut ZZX, a: &ZZX) {
     let da = a.deg();
     if da < 0 {
         c.set_length(0);
@@ -729,16 +731,16 @@ fn PlainSqr(c: &mut ZZX, a: &ZZX) {
     c.normalize();
 }
 
-fn KarSqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void KarSqr(ZZX& c, const ZZX& a)` func");
+fn kar_sqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void kar_sqr(ZZX& c, const ZZX& a)` func");
 }
 
-fn SSSqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void SSSqr(ZZX& c, const ZZX& a)` func");
+fn ss_sqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void ss_sqr(ZZX& c, const ZZX& a)` func");
 }
 
-fn HomSqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void HomSqr(ZZX& c, const ZZX& a)` func");
+fn hom_sqr(c: &mut ZZX, a: &ZZX) {
+    todo!("impl `void hom_sqr(ZZX& c, const ZZX& a)` func");
 }
 
 /// x = a % X^m
@@ -928,7 +930,7 @@ impl Add for ZZX {
         let mut output = ZZX::new();
         add(&mut output, &self, &rhs);
         output
-    }   
+    }
 }
 
 impl Sub for ZZX {
