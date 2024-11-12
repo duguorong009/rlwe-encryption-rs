@@ -209,21 +209,24 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
         return;
     }
 
-    let maxa: u32 = a.max_size();
-    let maxb: u32 = b.max_size();
+    // let maxa: u32 = a.max_size();
+    // let maxb: u32 = b.max_size();
 
-    let k = maxa.min(maxb);
-    let s = a.deg().min(b.deg()) + 1;
+    // let k = maxa.min(maxb);
+    // let s = a.deg().min(b.deg()) + 1;
 
-    if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
-        plain_mul(c, a, b);
-    } else if s < 80 || (k < 30 && s < 150) {
-        kar_mul(c, a, b);
-    } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()) {
-        ss_mul(c, a, b);
-    } else {
-        hom_mul(c, a, b);
-    }
+    // if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
+    //     plain_mul(c, a, b);
+    // } else if s < 80 || (k < 30 && s < 150) {
+    //     kar_mul(c, a, b);
+    // } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()) {
+    //     ss_mul(c, a, b);
+    // } else {
+    //     hom_mul(c, a, b);
+    // }
+
+    // TODO: uncomment the above.
+    plain_mul(c, a, b);
 }
 
 pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
