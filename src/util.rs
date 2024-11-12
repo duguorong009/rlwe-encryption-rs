@@ -212,7 +212,7 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
         return;
     }
     if a == b {
-        sqr(c, a);
+        _sqr(c, a);
         return;
     }
 
@@ -1182,7 +1182,7 @@ pub fn mul_trunc(a: &ZZX, b: &ZZX, n: i64) -> ZZX {
 /// x = a^2 % X^n
 fn _sqr_trunc(x: &mut ZZX, a: &ZZX, n: i64) {
     let mut t = ZZX::new();
-    sqr(&mut t, a);
+    _sqr(&mut t, a);
     _trunc(x, &t, n);
 }
 
