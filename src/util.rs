@@ -1065,3 +1065,16 @@ fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
 
     c.coeffs = g.coeffs;
 }
+
+/// x = a * b % X^n
+fn _mul_trunc(x: &mut ZZX, a: &ZZX, b: &ZZX, n: i64) {
+    let mut t = ZZX::new();
+    mul(&mut t, a, b);
+    _trunc(x, &t, n as usize);
+}
+
+pub fn mul_trunc(a: &ZZX, b: &ZZX, n: i64) -> ZZX {
+    let mut x = ZZX::new();
+    _mul_trunc(&mut x, a, b, n);
+    x
+}
