@@ -291,10 +291,6 @@ fn const_rem(r: &mut ZZX, a: &ZZX, b: Integer) {
     r.coeffs = vec![Integer::from(0)];
 }
 
-fn pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
-    plain_pseudo_rem(r, a, b);
-}
-
 fn plain_pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     let mut q = ZZX::new();
     plain_pseudo_div_rem(&mut q, r, a, b);
@@ -366,6 +362,14 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
         r.coeffs[i as usize] = xp[i as usize].clone();
     }
     r.normalize();
+}
+
+fn pseudo_div(q: &mut ZZX, a: &ZZX, b: &ZZX) {
+    plain_pseudo_div(q, a, b);
+}
+
+fn pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
+    plain_pseudo_rem(r, a, b);
 }
 
 fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
