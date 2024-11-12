@@ -658,25 +658,34 @@ fn plain_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 }
 
 fn kar_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    // if a.is_zero() || b.is_zero() {
-    //     c.set_length(0);
-    //     return;
-    // }
+    if a.is_zero() || b.is_zero() {
+        c.clear();
+        return;
+    }
 
-    // if a == b {
-    //     kar_sqr(c, a);
-    //     return;
-    // }
+    if a == b {
+        kar_sqr(c, a);
+        return;
+    }
 
-    // let sa = a.coeffs.len();
-    // let sb = b.coeffs.len();
+    let sa = a.coeffs.len();
+    let sb = b.coeffs.len();    
 
-    // let ap = &a.coeffs;
-    // let bp = &b.coeffs;
+    c.set_length(sa + sb - 1);
 
-    // c.set_length(sa + sb - 1);
+    let maxa = a.max_bits();
+    let maxb = b.max_bits();
+    let xover = 2;
 
-    todo!("impl `void kar_mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+    if sa < xover || sb < xover {
+        // _plain_mul_in_(&c.coeffs, &a.coeffs, sa, &b.coeffs, sb);
+        todo!()
+    } else {
+        /* karatsuba */
+        todo!()
+    }
+
+    c.normalize();
 }
 
 fn ss_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
