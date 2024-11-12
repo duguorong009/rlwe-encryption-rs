@@ -1,5 +1,5 @@
 use core::panic;
-use std::ops::{Add, Index, IndexMut, Mul, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
+use std::ops::{Add, AddAssign, Index, IndexMut, Mul, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign};
 
 use rug::{
     ops::{NegAssign, Pow},
@@ -973,6 +973,44 @@ impl Add for ZZX {
     }
 }
 
+impl Add<&ZZX> for ZZX {
+    type Output = ZZX;
+
+    fn add(self, rhs: &ZZX) -> Self::Output {
+        let mut output = ZZX::new();
+        add(&mut output, &self, rhs);
+        output
+    }
+}
+
+impl Add<ZZX> for &ZZX {
+    type Output = ZZX;
+
+    fn add(self, rhs: ZZX) -> Self::Output {
+        let mut output = ZZX::new();
+        add(&mut output, self, &rhs);
+        output
+    }
+}
+
+impl Add<&ZZX> for &ZZX {
+    type Output = ZZX;
+
+    fn add(self, rhs: &ZZX) -> Self::Output {
+        let mut output = ZZX::new();
+        add(&mut output, self, rhs);
+        output
+    }
+}
+
+impl AddAssign for ZZX {
+    fn add_assign(&mut self, rhs: Self) {
+        let mut tmp = ZZX::new();
+        add(&mut tmp, self, &rhs);
+        *self = tmp;
+    }
+}
+
 impl Sub for ZZX {
     type Output = ZZX;
 
@@ -983,6 +1021,44 @@ impl Sub for ZZX {
     }
 }
 
+impl Sub<&ZZX> for ZZX {
+    type Output = ZZX;
+
+    fn sub(self, rhs: &ZZX) -> Self::Output {
+        let mut output = ZZX::new();
+        sub(&mut output, &self, rhs);
+        output
+    }
+}
+
+impl Sub<ZZX> for &ZZX {
+    type Output = ZZX;
+
+    fn sub(self, rhs: ZZX) -> Self::Output {
+        let mut output = ZZX::new();
+        sub(&mut output, self, &rhs);
+        output
+    }
+}
+
+impl Sub<&ZZX> for &ZZX {
+    type Output = ZZX;
+
+    fn sub(self, rhs: &ZZX) -> Self::Output {
+        let mut output = ZZX::new();
+        sub(&mut output, self, rhs);
+        output
+    }
+}
+
+impl SubAssign for ZZX {
+    fn sub_assign(&mut self, rhs: Self) {
+        let mut tmp = ZZX::new();
+        sub(&mut tmp, self, &rhs);
+        *self = tmp;
+    }
+}
+
 impl Neg for ZZX {
     type Output = ZZX;
 
@@ -990,6 +1066,14 @@ impl Neg for ZZX {
         let mut output = ZZX::new();
         negate(&mut output, &self);
         output
+    }
+}
+
+impl NegAssign for ZZX {
+    fn neg_assign(&mut self) {
+        let mut output = ZZX::new();
+        negate(&mut output, self);
+        *self = output;
     }
 }
 
