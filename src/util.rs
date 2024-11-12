@@ -1,3 +1,4 @@
+use core::panic;
 use std::ops::{Add, Index, IndexMut, Mul, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
 
 use rug::{
@@ -766,7 +767,13 @@ fn hom_sqr(c: &mut ZZX, a: &ZZX) {
 }
 
 /// x = a % X^m
-fn _trunc(x: &mut ZZX, a: &ZZX, m: usize) {
+fn _trunc(x: &mut ZZX, a: &ZZX, m: i64) {
+    if m < 0 {
+        panic!("trunc: m < 0");
+    }
+
+    let m = m as usize;
+
     let n = m.min(a.coeffs.len());
     x.set_length(n);
 
@@ -776,7 +783,7 @@ fn _trunc(x: &mut ZZX, a: &ZZX, m: usize) {
     x.normalize();
 }
 
-pub fn trunc(a: &ZZX, m: usize) -> ZZX {
+pub fn trunc(a: &ZZX, m: i64) -> ZZX {
     let mut x = ZZX::new();
     _trunc(&mut x, a, m);
     x
@@ -1051,13 +1058,13 @@ fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
         let k = _e[i];
         let l = _e[i - 1] - _e[i];
 
-        g0 = trunc(a, (k + l) as usize);
+        g0 = trunc(a, k + l);
         g1 = g0 * g.clone();
         g1 = right_shift(&g1, k);
-        g1 = trunc(&g1, l as usize);
+        g1 = trunc(&g1, l);
 
         g2 = g1 * g.clone();
-        g2 = trunc(&g2, l as usize);
+        g2 = trunc(&g2, l);
         g2 = left_shift(&g2, k);
 
         g = g - g2;
@@ -1070,7 +1077,7 @@ fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
 fn _mul_trunc(x: &mut ZZX, a: &ZZX, b: &ZZX, n: i64) {
     let mut t = ZZX::new();
     mul(&mut t, a, b);
-    _trunc(x, &t, n as usize);
+    _trunc(x, &t, n);
 }
 
 pub fn mul_trunc(a: &ZZX, b: &ZZX, n: i64) -> ZZX {
