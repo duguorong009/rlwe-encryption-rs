@@ -372,6 +372,57 @@ fn pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     plain_pseudo_rem(r, a, b);
 }
 
+fn pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
+    plain_pseudo_div_rem(q, r, a, b);
+}
+
+fn div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
+    let da = a.deg();
+    let db = b.deg();
+
+    if db < 0 {
+        panic!("div_rem: division by zero");
+    }
+
+    if da < db {
+        r.coeffs = a.coeffs.clone();
+        q.clear();
+    } else if db == 0 {
+        const_div_rem(q, r, a, &b.const_term());
+    } else if b.lead_coeff() == 1 {
+        pseudo_div_rem(q, r, a, b);
+    } else if b.lead_coeff() == -1 {
+        let mut b1 = ZZX::new();
+        negate(&mut b1, b);
+        pseudo_div_rem(q, r, a, &b1);
+        negate(q, &q.clone());
+    } else if divide(q, a, b) {
+        r.clear();
+    } else {
+        let mut q1 = ZZX::new();
+        let mut r1 = ZZX::new();
+        let mut m = Integer::new();
+        pseudo_div_rem(&mut q1, &mut r1, a, b);
+        m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
+        if !divide_with_integer(q, &mut q1, &m) {
+            panic!("div_rem: quotient not defined over ZZ");
+        }
+        if !divide_with_integer(r, &mut r1, &m) {
+            panic!("div_rem: remainder not defined over ZZ");
+        }
+    }
+}
+
+fn const_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &Integer) {
+    if b == &0 {
+        panic!("const_div_rem: division by zero");
+    }
+    if !divide_with_integer(q, a, b) {
+        panic!("const_div_rem: quotient not defined over ZZ");
+    }
+    r.clear();
+}
+
 fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
     let da = a.deg();
     let db = b.deg();
