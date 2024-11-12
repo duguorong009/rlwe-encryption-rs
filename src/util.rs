@@ -300,6 +300,11 @@ fn plain_pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     plain_pseudo_div_rem(&mut q, r, a, b);
 }
 
+fn plain_pseudo_div(q: &mut ZZX, a: &ZZX, b: &ZZX) {
+    let mut r = ZZX::new();
+    plain_pseudo_div_rem(q, &mut r, a, b);
+}
+
 fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
     let da = a.deg();
     let db = b.deg();
