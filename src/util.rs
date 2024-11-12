@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Index, IndexMut, Neg, Shl, Shr, Sub};
+use std::ops::{Add, Index, IndexMut, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
 
 use rug::{
     ops::{NegAssign, Pow},
@@ -789,9 +789,9 @@ fn _right_shift(x: &mut ZZX, a: &ZZX, n: i64) {
     let n = n as usize;
     let da = da as usize;
 
-    x.set_length(a.coeffs.len() - n);
+    x.set_length(da - n + 1);
 
-    for i in 0..da - n {
+    for i in 0..=(da - n) {
         x.coeffs[i] = a.coeffs[i + n].clone();
     }
 
@@ -826,7 +826,6 @@ fn _left_shift(x: &mut ZZX, a: &ZZX, n: i64) {
     for i in 0..n {
         x.coeffs[i] = Integer::from(0);
     }
-    x.normalize();
 }
 
 pub fn left_shift(a: &ZZX, n: i64) -> ZZX {
@@ -843,11 +842,23 @@ impl Shl<i64> for ZZX {
     }
 }
 
+impl ShlAssign<i64> for ZZX {
+    fn shl_assign(&mut self, shift: i64) {
+        *self = left_shift(self, shift);
+    }
+}
+
 impl Shr<i64> for ZZX {
     type Output = ZZX;
 
     fn shr(self, shift: i64) -> Self::Output {
         right_shift(&self, shift)
+    }
+}
+
+impl ShrAssign<i64> for ZZX {
+    fn shr_assign(&mut self, shift: i64) {
+        *self = right_shift(self, shift);
     }
 }
 
