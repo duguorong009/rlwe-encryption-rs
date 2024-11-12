@@ -1098,3 +1098,46 @@ pub fn sqr_trunc(a: &ZZX, n: i64) -> ZZX {
     _sqr_trunc(&mut x, a, n);
     x
 }
+
+fn _reverse(x: &mut ZZX, a: &ZZX, hi: i64) {
+    if hi < 0 {
+        x.clear();
+        return;
+    }
+
+    // TODO: check NTL_OVERFLOW(hi, 1, 0)
+
+    if x == a {
+        let mut tmp = ZZX::new();
+        _copy_reverse(&mut tmp, a, hi as usize);
+        x.coeffs = tmp.coeffs;
+    } else {
+        _copy_reverse(x, a, hi as usize);
+    }
+}
+
+/// x[0..hi] = reverse(a[0..hi]), with zero fill
+/// input may not alias output
+fn _copy_reverse(x: &mut ZZX, a: &ZZX, hi: usize) {
+    let n = hi + 1;
+    let m = a.coeffs.len();
+
+    x.set_length(n);
+
+    for i in 0..n {
+        let j = hi - i;
+        if j >= m {
+            x.coeffs[i] = Integer::from(0);
+        } else {
+            x.coeffs[i] = a.coeffs[j].clone();
+        }
+    }
+
+    x.normalize();
+}
+
+pub fn reverse(a: &ZZX, hi: i64) -> ZZX {
+    let mut x = ZZX::new();
+    _reverse(&mut x, a, hi);
+    x
+}
