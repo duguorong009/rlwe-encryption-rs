@@ -1,5 +1,6 @@
-use core::panic;
-use std::ops::{Add, AddAssign, Index, IndexMut, Mul, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign};
+use std::ops::{
+    Add, AddAssign, Index, IndexMut, Mul, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+};
 
 use rug::{
     ops::{NegAssign, Pow},
