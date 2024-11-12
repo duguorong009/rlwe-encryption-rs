@@ -1085,3 +1085,16 @@ pub fn mul_trunc(a: &ZZX, b: &ZZX, n: i64) -> ZZX {
     _mul_trunc(&mut x, a, b, n);
     x
 }
+
+/// x = a^2 % X^n
+fn _sqr_trunc(x: &mut ZZX, a: &ZZX, n: i64) {
+    let mut t = ZZX::new();
+    sqr(&mut t, a);
+    _trunc(x, &t, n);
+}
+
+pub fn sqr_trunc(a: &ZZX, n: i64) -> ZZX {
+    let mut x = ZZX::new();
+    _sqr_trunc(&mut x, a, n);
+    x
+}
