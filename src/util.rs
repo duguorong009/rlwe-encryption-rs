@@ -198,6 +198,7 @@ pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {
     rem(x, &t, f);
 }
 
+/// x = a * b
 pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     if a.is_zero() || b.is_zero() {
         c.set_length(0);
@@ -208,27 +209,21 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
         return;
     }
 
-    let maxa: u32 = a.max_size(); // MaxSize(a)
-    let maxb: u32 = b.max_size(); // MaxSize(b)
+    let maxa: u32 = a.max_size();
+    let maxb: u32 = b.max_size();
 
     let k = maxa.min(maxb);
     let s = a.deg().min(b.deg()) + 1;
 
-    // // FIXME: I should have a way of setting all these crossovers
-    // // automatically
-
-    // if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
-    //     plain_mul(c, a, b);
-    // } else if s < 80 || (k < 30 && s < 150) {
-    //     KarMul(c, a, b);
-    // } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()){
-    //     SSMul(c, a, b);
-    // } else {
-    //     HomMul(c, a, b);
-    // }
-
-    // TODO: uncomment the above.
-    plain_mul(c, a, b);
+    if s == 1 || (k == 1 && s < 40) || (k == 2 && s < 20) || (k == 3 && s < 10) {
+        plain_mul(c, a, b);
+    } else if s < 80 || (k < 30 && s < 150) {
+        kar_mul(c, a, b);
+    } else if choose_ss(a.deg(), a.max_bits(), b.deg(), b.max_bits()) {
+        ss_mul(c, a, b);
+    } else {
+        hom_mul(c, a, b);
+    }
 }
 
 pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
@@ -662,7 +657,7 @@ fn plain_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     c.normalize();
 }
 
-fn KarMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+fn kar_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     // if a.is_zero() || b.is_zero() {
     //     c.set_length(0);
     //     return;
@@ -681,15 +676,15 @@ fn KarMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 
     // c.set_length(sa + sb - 1);
 
-    todo!("impl `void KarMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+    todo!("impl `void kar_mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
 }
 
-fn SSMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    todo!("impl `void SSMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+fn ss_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void ss_mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
 }
 
-fn HomMul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    todo!("impl `void HomMul(ZZX& c, const ZZX& a, const ZZX& b)` func");
+fn hom_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
+    todo!("impl `void hom_mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
 }
 
 fn choose_ss(a_deg: i64, a_max_bits: u32, b_deg: i64, b_max_bits: u32) -> bool {
