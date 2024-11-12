@@ -1,5 +1,5 @@
 use std::ops::{
-    Add, AddAssign, Index, IndexMut, Mul, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign,
+    Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign
 };
 
 use rug::{
@@ -243,6 +243,14 @@ impl Mul for ZZX {
         let mut res = ZZX::new();
         mul(&mut res, &self, &rhs);
         res
+    }
+}
+
+impl MulAssign for ZZX {
+    fn mul_assign(&mut self, rhs: Self) {
+        let mut output = ZZX::new();
+        mul(&mut output, &self, &rhs);
+        *self = output;
     }
 }
 
