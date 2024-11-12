@@ -1,4 +1,4 @@
-use std::ops::{Add, AddAssign, Index, IndexMut, Shl, Shr, Sub};
+use std::ops::{Add, AddAssign, Index, IndexMut, Neg, Shl, Shr, Sub};
 
 use rug::{
     ops::{NegAssign, Pow},
@@ -946,6 +946,16 @@ impl Sub for ZZX {
     fn sub(self, rhs: Self) -> Self::Output {
         let mut output = ZZX::new();
         sub(&mut output, &self, &rhs);
+        output
+    }
+}
+
+impl Neg for ZZX {
+    type Output = ZZX;
+
+    fn neg(self) -> Self::Output {
+        let mut output = ZZX::new();
+        negate(&mut output, &self);
         output
     }
 }
