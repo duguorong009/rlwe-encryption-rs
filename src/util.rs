@@ -1,4 +1,4 @@
-use std::ops::{Add, Index, IndexMut, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
+use std::ops::{Add, Index, IndexMut, Mul, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub};
 
 use rug::{
     ops::{NegAssign, Pow},
@@ -22,8 +22,13 @@ impl ZZX {
 
     /// init with single coefficient
     pub fn new_with_val<T: Into<Integer>>(n: T) -> Self {
-        ZZX {
-            coeffs: vec![n.into()],
+        let n = n.into();
+        if n == 0 {
+            ZZX::new()
+        } else {
+            ZZX {
+                coeffs: vec![n.into()],
+            }
         }
     }
 
@@ -227,6 +232,16 @@ pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
 
     // TODO: uncomment the above.
     plain_mul(c, a, b);
+}
+
+impl Mul for ZZX {
+    type Output = ZZX;
+
+    fn mul(self, rhs: Self) -> Self::Output {
+        let mut res = ZZX::new();
+        mul(&mut res, &self, &rhs);
+        res
+    }
 }
 
 pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
@@ -672,7 +687,7 @@ fn kar_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     }
 
     let sa = a.coeffs.len();
-    let sb = b.coeffs.len();    
+    let sb = b.coeffs.len();
 
     c.set_length(sa + sb - 1);
 
@@ -971,83 +986,82 @@ impl Neg for ZZX {
     }
 }
 
-// /// x = a^{-1} % X^m
-// fn _inv_trunc(x: &mut ZZX, a: &ZZX, m: i64) {
-//     if m < 0 {
-//         panic!("inv_trunc: m < 0");
-//     }
+/// x = a^{-1} % X^m
+fn _inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
+    if e < 0 {
+        panic!("inv_trunc: m < 0");
+    }
 
-//     if m == 0 {
-//         x.clear();
-//         return;
-//     }
+    if e == 0 {
+        c.clear();
+        return;
+    }
 
-//     // TODO: add ntl overflow check `NTL_OVERFLOW(e, 1, 0)`
+    // TODO: add ntl overflow check `NTL_OVERFLOW(e, 1, 0)`
 
-//     newton_inv_trunc(x, a, m);
-// }
+    newton_inv_trunc(c, a, e);
+}
 
-// pub fn inv_trunc(a: &ZZX, m: i64) -> ZZX {
-//     let mut x = ZZX::new();
-//     _inv_trunc(&mut x, a, m);
-//     x
-// }
+pub fn inv_trunc(a: &ZZX, e: i64) -> ZZX {
+    let mut x = ZZX::new();
+    _inv_trunc(&mut x, a, e);
+    x
+}
 
-// fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, m: i64) {
-//     let x = if a.const_term() == 1 {
-//         Integer::from(1)
-//     } else if a.const_term() == -1 {
-//         Integer::from(-1)
-//     } else {
-//         panic!("inv_trunc: non-invertible constant term");
-//     };
+fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
+    let x = if a.const_term() == 1 {
+        Integer::from(1)
+    } else if a.const_term() == -1 {
+        Integer::from(-1)
+    } else {
+        panic!("inv_trunc: non-invertible constant term");
+    };
 
-//     if m == 1 {
-//         conv(c, x);
-//         return;
-//     }
+    if e == 1 {
+        c.coeffs = ZZX::new_with_val(x).coeffs;
+        return;
+    }
 
-//     let mut _E = Vec::new();
-//     _E.push(m);
-//     let mut m = m;
-//     while m > 1 {
-//         m = (m + 1) / 2;
-//         _E.push(m);
-//     }
+    let mut _e = Vec::new();
+    _e.push(e);
+    let mut e = e;
+    while e > 1 {
+        e = (e + 1) / 2;
+        _e.push(e);
+    }
 
-//     let _L = _E.len();
+    let _l = _e.len();
 
-//     let mut g = ZZX::new();
-//     g.set_length(_E[0] as usize);
+    let mut g = ZZX::new();
+    g.set_max_length(_e[0] as usize);
 
-//     let mut g0 = ZZX::new();
-//     g0.set_length(_E[0] as usize);
+    let mut g0 = ZZX::new();
+    g0.set_max_length(_e[0] as usize);
 
-//     let mut g1 = ZZX::new();
-//     g1.set_length(((3 * _E[0] + 1) / 2) as usize);
+    let mut g1 = ZZX::new();
+    g1.set_max_length(((3 * _e[0] + 1) / 2) as usize);
 
-//     let mut g2 = ZZX::new();
-//     g2.set_length(_E[0] as usize);
+    let mut g2 = ZZX::new();
+    g2.set_max_length(_e[0] as usize);
 
-//     conv(g, x);
+    let mut g = ZZX::new_with_val(x);
 
-//     for i in (1.._L).rev() {
-//         // lift from _E[i] to _E[i - 1]
-//         let k = _E[i];
-//         let l = _E[i - 1] - _E[i];
+    for i in (1.._l).rev() {
+        // lift from _e[i] to _e[i - 1]
+        let k = _e[i];
+        let l = _e[i - 1] - _e[i];
 
-//         _trunc(&mut g0, a, (k + l) as usize);
-//         mul(&mut g1, &g0, &g);
-//         _right_shift(&mut g1, &g1, k);
-//         _trunc(&mut g, &g1, l as usize);
+        g0 = trunc(a, (k + l) as usize);
+        g1 = g0 * g.clone();
+        g1 = right_shift(&g1, k);
+        g1 = trunc(&g1, l as usize);
 
-//         mul(&mut g2, &g1, &g);
-//         _trunc(&mut g2, &g2, l as usize);
-//         _left_shift(&mut g2, &g2, k);
+        g2 = g1 * g.clone();
+        g2 = trunc(&g2, l as usize);
+        g2 = left_shift(&g2, k);
 
-//         sub(&mut g, &g, &g2);
-//     }
+        g = g - g2;
+    }
 
-//     c = g;
-
-// }
+    c.coeffs = g.coeffs;
+}
