@@ -620,7 +620,8 @@ fn content(c: &mut Integer, f: &ZZX) {
     *c = res;
 }
 
-fn sqr(c: &mut ZZX, a: &ZZX) {
+/// x = a ^ 2
+fn _sqr(c: &mut ZZX, a: &ZZX) {
     if a.is_zero() {
         c.set_length(0);
         return;
@@ -642,6 +643,13 @@ fn sqr(c: &mut ZZX, a: &ZZX) {
 
     // TODO: uncomment the above.
     plain_sqr(c, a);
+}
+
+/// x = a ^ 2
+pub fn sqr(a: &ZZX) -> ZZX {
+    let mut c = ZZX::new();
+    _sqr(&mut c, a);
+    c
 }
 
 fn plain_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
