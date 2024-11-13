@@ -1,5 +1,6 @@
 use std::ops::{
-    Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign
+    Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub,
+    SubAssign,
 };
 
 use rug::{
@@ -421,6 +422,47 @@ fn const_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &Integer) {
         panic!("const_div_rem: quotient not defined over ZZ");
     }
     r.clear();
+}
+
+fn div(q: &mut ZZX, a: &ZZX, b: &ZZX) {
+    let da = a.deg();
+    let db = b.deg();
+
+    if db < 0 {
+        panic!("div: division by zero");
+    }
+
+    if da < db {
+        q.clear();
+    } else if db == 0 {
+        div_with_integer(q, a, &b.const_term());
+    } else if b.lead_coeff() == 1 {
+        pseudo_div(q, a, b);
+    } else if b.lead_coeff() == -1 {
+        let mut b1 = ZZX::new();
+        negate(&mut b1, b);
+        pseudo_div(q, a, &b1);
+        negate(q, &q.clone());
+    } else if divide(q, a, b) {
+        // nothing to do
+    } else {
+        let mut q1 = ZZX::new();
+        let mut m = Integer::new();
+        pseudo_div(&mut q1, a, b);
+        m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
+        if !divide_with_integer(q, &mut q1, &m) {
+            panic!("div: quotient not defined over ZZ");
+        }
+    }
+}
+
+fn div_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) {
+    if b == &0 {
+        panic!("div: division by zero");
+    }
+    if !divide_with_integer(q, a, b) {
+        panic!("div: quotient not defined over ZZ");
+    }
 }
 
 fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
