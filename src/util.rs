@@ -859,6 +859,53 @@ pub fn primitive_part(f: &ZZX) -> ZZX {
     pp
 }
 
+/// d = gcd(a, b), d.lead_coeff() >= 0
+fn _gcd(d: &mut ZZX, a: &ZZX, b: &ZZX) {
+    if a.is_zero() {
+        d.coeffs = b.coeffs.clone();
+        if d.lead_coeff().is_negative() {
+            let temp = d.clone();
+            negate(d, &temp);
+        }
+        return;
+    }
+
+    if b.is_zero() {
+        d.coeffs = a.coeffs.clone();
+        if d.lead_coeff().is_negative() {
+            let temp = d.clone();
+            negate(d, &temp);
+        }
+        return;
+    }
+
+    let mut c1 = Integer::new();
+    let mut c2 = Integer::new();
+
+    let mut f1 = ZZX::new();
+    let mut f2 = ZZX::new();
+
+    _content(&mut c1, a);
+    divide_with_integer(&mut f1, a, &c1);
+
+    _content(&mut c2, b);
+    divide_with_integer(&mut f2, b, &c2);
+
+    let c = &c1.gcd_ref(&c2).complete();
+
+    let ld = f1.lead_coeff().gcd(&f2.lead_coeff());
+
+    let prod = Integer::from(1);
+
+    todo!()
+}
+
+pub fn gcd(a: &ZZX, b: &ZZX) -> ZZX {
+    let mut d = ZZX::new();
+    _gcd(&mut d, a, b);
+    d
+}
+
 /// x = a ^ 2
 fn _sqr(c: &mut ZZX, a: &ZZX) {
     if a.is_zero() {
