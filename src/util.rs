@@ -1,5 +1,6 @@
 use std::ops::{
-    Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Rem, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign
+    Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Rem, Shl, ShlAssign, Shr, ShrAssign,
+    Sub, SubAssign,
 };
 
 use rug::{
@@ -195,14 +196,22 @@ impl IndexMut<usize> for ZZX {
     }
 }
 
-pub fn mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {
-    if a.deg() >= f.deg() || b.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != *Integer::ONE {
+// Modular arithmetic -- f must be monic, and other args
+// must have degree less than that of f
+fn _mulmod(x: &mut ZZX, a: &ZZX, b: &ZZX, f: &ZZX) {
+    if a.deg() >= f.deg() || b.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != 1 {
         panic!("MulMod: bad args");
     }
 
     let mut t = ZZX::new();
     mul(&mut t, a, b);
     rem(x, &t, f);
+}
+
+pub fn mulmod(a: &ZZX, b: &ZZX, f: &ZZX) -> ZZX {
+    let mut x = ZZX::new();
+    _mulmod(&mut x, a, b, f);
+    x
 }
 
 /// x = a * b
