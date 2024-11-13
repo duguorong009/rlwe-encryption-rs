@@ -1,6 +1,5 @@
 use std::ops::{
-    Add, AddAssign, Index, IndexMut, Mul, MulAssign, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub,
-    SubAssign,
+    Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign
 };
 
 use rug::{
@@ -462,6 +461,26 @@ fn div_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) {
     }
     if !divide_with_integer(q, a, b) {
         panic!("div: quotient not defined over ZZ");
+    }
+}
+
+impl Div for ZZX {
+    type Output = ZZX;
+
+    fn div(self, rhs: Self) -> Self::Output {
+        let mut res = ZZX::new();
+        div(&mut res, &self, &rhs);
+        res
+    }
+}
+
+impl Div<Integer> for ZZX {
+    type Output = ZZX;
+
+    fn div(self, rhs: Integer) -> Self::Output {
+        let mut res = ZZX::new();
+        div_with_integer(&mut res, &self, &rhs);
+        res
     }
 }
 
