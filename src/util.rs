@@ -147,11 +147,13 @@ impl ZZX {
     }
 
     pub fn max_size(&self) -> u32 {
-        let mut res = 0;
-        for i in 0..self.coeffs.len() {
-            res = res.max(self.coeffs[i].significant_bits());
-        }
-        res
+        // let mut res = 0;
+        // for i in 0..self.coeffs.len() {
+        //     res = res.max(self.coeffs[i].size());
+        // }
+        // res
+
+        64
     }
 
     pub fn max_bits(&self) -> u32 {
