@@ -229,6 +229,47 @@ pub fn sqrmod(a: &ZZX, f: &ZZX) -> ZZX {
     x
 }
 
+fn _mulbyxmod_aux(h: &mut ZZX, a: &ZZX, f: &ZZX) {
+    let n = f.deg();
+    let m = a.deg();
+
+    if m >= n || n == 0 || f.lead_coeff() != 1 {
+        panic!("MulByXMod: bad args");
+    }
+
+    if m < 0 {
+        h.clear();
+        return;
+    }
+
+    if m < n - 1 {
+        h.set_length(m as usize + 2);
+        for i in (1..m).rev() {
+            h.coeffs[i as usize] = a.coeffs[i as usize - 1].clone();
+            h.coeffs[0] = Integer::new();
+        }
+    } else {
+        h.set_length(n as usize);
+        let z = -a.coeffs[n as usize - 1].clone();
+        for i in (1..n).rev() {
+            let t = z.clone() * f.coeffs[i as usize].clone();
+            h.coeffs[i as usize] = a.coeffs[i as usize - 1].clone() * t;
+        }
+        h.coeffs[0] = z * f.coeffs[0].clone();
+        h.normalize();
+    }
+}
+
+fn _mulbyxmod(h: &mut ZZX, a: &ZZX, f: &ZZX) {
+    _mulbyxmod_aux(h, a, f);
+}
+
+pub fn mulbyxmod(a: &ZZX, f: &ZZX) -> ZZX {
+    let mut x = ZZX::new();
+    _mulbyxmod(&mut x, a, f);
+    x
+}
+
 /// x = a * b
 pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     if a.is_zero() || b.is_zero() {
