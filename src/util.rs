@@ -156,6 +156,7 @@ impl ZZX {
         64
     }
 
+    /// returns the max NumBits of coefficients
     pub fn max_bits(&self) -> u32 {
         let mut m = 0;
         for i in 0..self.deg() as usize {
