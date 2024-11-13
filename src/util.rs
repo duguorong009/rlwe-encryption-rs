@@ -569,6 +569,7 @@ impl Rem<Integer> for ZZX {
     }
 }
 
+// if b | a, sets q = a / b and returns true; otherwise returns false
 fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
     let da = a.deg();
     let db = b.deg();
@@ -617,8 +618,8 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
 
     let mut ca = Integer::from(0);
     let mut cb = Integer::from(0);
-    content(&mut ca, aa);
-    content(&mut cb, bb);
+    _content(&mut ca, aa);
+    _content(&mut cb, bb);
 
     let (cq, r) = ca.div_rem_ref(&cb).complete();
     if !r.is_zero() {
@@ -787,10 +788,10 @@ fn hom_divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
 
     let mut ca = Integer::new();
     let mut cb = Integer::new();
-    content(&mut ca, a);
-    content(&mut cb, b);
+    _content(&mut ca, a);
+    _content(&mut cb, b);
 
-    let (cq, r) = ca.div_rem_ref(&cb).complete();
+    let (_, r) = ca.div_rem_ref(&cb).complete();
     if !r.is_zero() {
         return false; // 0
     }
@@ -820,7 +821,8 @@ fn hom_divide_(a: &ZZX, b: &ZZX) -> bool {
     }
 }
 
-fn content(c: &mut Integer, f: &ZZX) {
+/// c = content of f, sign(c) = sign(f.lead_coeff())
+fn _content(c: &mut Integer, f: &ZZX) {
     let mut res = Integer::from(0);
     for i in 0..f.coeffs.len() {
         res = res.gcd(&f.coeffs[i]);
@@ -832,6 +834,12 @@ fn content(c: &mut Integer, f: &ZZX) {
         res = -res;
     }
     *c = res;
+}
+
+fn content(f: &ZZX) -> Integer {
+    let mut res = Integer::from(0);
+    _content(&mut res, f);
+    res
 }
 
 /// x = a ^ 2
