@@ -836,10 +836,27 @@ fn _content(c: &mut Integer, f: &ZZX) {
     *c = res;
 }
 
-fn content(f: &ZZX) -> Integer {
+pub fn content(f: &ZZX) -> Integer {
     let mut res = Integer::from(0);
     _content(&mut res, f);
     res
+}
+
+/// pp = primitive part of f, pp.lead_coeff() >= 0
+fn _primitive_part(pp: &mut ZZX, f: &ZZX) {
+    if f.is_zero() {
+        pp.clear();
+        return;
+    }
+
+    let d = content(f);
+    divide_with_integer(pp, f, &d);
+}
+
+pub fn primitive_part(f: &ZZX) -> ZZX {
+    let mut pp = ZZX::new();
+    _primitive_part(&mut pp, f);
+    pp
 }
 
 /// x = a ^ 2
