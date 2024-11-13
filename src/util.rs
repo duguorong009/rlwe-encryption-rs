@@ -1,5 +1,5 @@
 use std::ops::{
-    Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign
+    Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Rem, Shl, ShlAssign, Shr, ShrAssign, Sub, SubAssign
 };
 
 use rug::{
@@ -265,7 +265,7 @@ pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     if da < db {
         r.coeffs = a.coeffs.clone();
     } else if db == 0 {
-        const_rem(r, a, b.const_term());
+        const_rem(r, a, &b.const_term());
     } else if b.lead_coeff() == 1 {
         pseudo_rem(r, a, b);
     } else if b.lead_coeff() == -1 {
@@ -284,8 +284,8 @@ pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     }
 }
 
-fn const_rem(r: &mut ZZX, a: &ZZX, b: Integer) {
-    if b == 0 {
+fn const_rem(r: &mut ZZX, a: &ZZX, b: &Integer) {
+    if b == &0 {
         panic!("const_rem: division by zero");
     }
     r.coeffs = vec![Integer::from(0)];
@@ -480,6 +480,26 @@ impl Div<Integer> for ZZX {
     fn div(self, rhs: Integer) -> Self::Output {
         let mut res = ZZX::new();
         div_with_integer(&mut res, &self, &rhs);
+        res
+    }
+}
+
+impl Rem for ZZX {
+    type Output = ZZX;
+
+    fn rem(self, rhs: Self) -> Self::Output {
+        let mut res = ZZX::new();
+        rem(&mut res, &self, &rhs);
+        res
+    }
+}
+
+impl Rem<Integer> for ZZX {
+    type Output = ZZX;
+
+    fn rem(self, rhs: Integer) -> Self::Output {
+        let mut res = ZZX::new();
+        const_rem(&mut res, &self, &rhs);
         res
     }
 }
