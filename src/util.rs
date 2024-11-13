@@ -214,6 +214,21 @@ pub fn mulmod(a: &ZZX, b: &ZZX, f: &ZZX) -> ZZX {
     x
 }
 
+fn _sqrmod(x: &mut ZZX, a: &ZZX, f: &ZZX) {
+    if a.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != 1 {
+        panic!("SqrMod: bad args");
+    }
+    let mut t = ZZX::new();
+    _sqr(&mut t, a);
+    rem(x, &t, f);
+}
+
+pub fn sqrmod(a: &ZZX, f: &ZZX) -> ZZX {
+    let mut x = ZZX::new();
+    _sqrmod(&mut x, a, f);
+    x
+}
+
 /// x = a * b
 pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     if a.is_zero() || b.is_zero() {
