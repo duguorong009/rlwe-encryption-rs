@@ -29,9 +29,7 @@ impl ZZX {
         if n == 0 {
             ZZX::new()
         } else {
-            ZZX {
-                coeffs: vec![n],
-            }
+            ZZX { coeffs: vec![n] }
         }
     }
 
@@ -1219,7 +1217,7 @@ pub fn sub(x: &mut ZZX, a: &ZZX, b: &ZZX) {
         x.coeffs = t.coeffs.clone();
         return;
     }
-    
+
     let db = b.deg();
     if db == -1 {
         x.coeffs = a.coeffs.clone();
@@ -1581,4 +1579,162 @@ fn _inner_product(res: &mut Integer, a: &[Integer], b: &[Integer]) {
     }
 
     *res = acc;
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_add() {
+        let a = ZZX::new_with_val(Integer::from(1));
+        let b = ZZX::new_with_val(Integer::from(2));
+        let c = &a + &b;
+        assert_eq!(c[0], 3);
+
+        let a = ZZX::new_with_vec(vec![1, 2, 3, 4]);
+        let b = ZZX::new_with_vec(vec![1, 2, 3, 4]);
+        let c = &a + &b;
+        assert_eq!(c[0], 2);
+        assert_eq!(c[1], 4);
+        assert_eq!(c[2], 6);
+        assert_eq!(c[3], 8);
+    }
+
+    #[test]
+    fn test_sub() {
+        let a = ZZX::new_with_vec(vec![1, 2]);
+        let b = ZZX::new_with_vec(vec![2, 3]);
+        let c = &a - &b;
+        assert_eq!(c[0], -1);
+        assert_eq!(c[1], -1);
+
+        let a = ZZX::new_with_vec(vec![1, 2, 3, 4]);
+        let c = a.clone() - a;
+        assert!(c.is_zero());
+
+        let a = ZZX::new_with_vec(vec![1, 2, 3, 4]);
+        let b = ZZX::new();
+        let c = &a - &b;
+        assert_eq!(c[0], 1);
+        assert_eq!(c[1], 2);
+        assert_eq!(c[2], 3);
+        assert_eq!(c[3], 4);
+
+        let a = ZZX::new();
+        let b = ZZX::new_with_vec(vec![1, 2, 3, 4]);
+        let c = &a - &b;
+        assert_eq!(c[0], -1);
+        assert_eq!(c[1], -2);
+        assert_eq!(c[2], -3);
+        assert_eq!(c[3], -4);
+    }
+
+    #[test]
+    fn test_mul() {
+        // normal
+        let a = ZZX::new_with_vec(vec![1, 2]);
+        let b = ZZX::new_with_vec(vec![2, 3]);
+        let c = &a * &b;
+        assert_eq!(c[0], 2);
+        assert_eq!(c[1], 7);
+        assert_eq!(c[2], 6);
+
+        // sqr
+        let a = ZZX::new_with_vec(vec![1, 1]);
+        let b = ZZX::new_with_vec(vec![1, 1]);
+        let c = &a * &b;
+        assert_eq!(c[0], 1);
+        assert_eq!(c[1], 2);
+        assert_eq!(c[2], 1);
+
+        // mul by zero
+        let a = ZZX::new_with_vec(vec![1, 2]);
+        let b = ZZX::new();
+        let c = &a * &b;
+        assert!(c.is_zero());
+
+        // mul zero by zero
+        let a = ZZX::new();
+        let b = ZZX::new();
+        let c = &a * &b;
+        assert!(c.is_zero());
+    }
+
+    #[test]
+    fn test_div() {
+        let a = ZZX::new_with_vec(vec![1, 2, 1]);
+        let b = ZZX::new_with_vec(vec![1, 1]);
+        let c = &a / &b;
+        assert_eq!(c[0], 1);
+        assert_eq!(c[1], 1);
+
+        let a = ZZX::new_with_vec(vec![1, -2, 1]);
+        let b = ZZX::new_with_vec(vec![-1, 1]);
+        let c = &a / &b;
+        assert_eq!(c[0], -1);
+        assert_eq!(c[1], 1);
+
+        let a = ZZX::new_with_vec(vec![2, 0, 2]);
+        let b = ZZX::new_with_vec(vec![1, 0, 1]);
+        let c = &a / &b;
+        assert_eq!(c[0], 2);
+
+        let a = ZZX::new_with_vec(vec![-2, 0, 0, 2]);
+        let b = ZZX::new_with_val(-2);
+        let c = &a / &b;
+        assert_eq!(c[0], 1);
+        assert_eq!(c[1], 0);
+        assert_eq!(c[2], 0);
+        assert_eq!(c[3], -1);
+    }
+
+    #[test]
+    fn test_rem() {
+        let a = ZZX::new_with_vec(vec![1, 2, 1]);
+        let b = ZZX::new_with_vec(vec![1, 1]);
+        let c = &a % &b;
+        assert!(c.is_zero());
+
+        let a = ZZX::new_with_vec(vec![2, -2, 1]);
+        let b = ZZX::new_with_vec(vec![-1, 1]);
+        let c = &a % &b;
+        assert_eq!(c[0], 1);
+
+        let a = ZZX::new_with_vec(vec![-1, 1]);
+        let b = ZZX::new_with_vec(vec![1, 1, 1]);
+        let c = &a % &b;
+        assert_eq!(c[0], -1);
+        assert_eq!(c[1], 1);
+    }
+
+    #[test]
+    fn test_left_shift() {
+        let a = ZZX::new_with_vec(vec![1, 2, 3]);
+        let c = a << 1;
+        assert_eq!(c[0], 0);
+        assert_eq!(c[1], 1);
+        assert_eq!(c[2], 2);
+        assert_eq!(c[3], 3);
+
+        let a = ZZX::new_with_vec(vec![1, 2, 3]);
+        let c = a << -1;
+        assert_eq!(c[0], 2);
+        assert_eq!(c[1], 3);
+    }
+
+    #[test]
+    fn test_right_shift() {
+        let a = ZZX::new_with_vec(vec![1, 2, 3]);
+        let c = a >> 1;
+        assert_eq!(c[0], 2);
+        assert_eq!(c[1], 3);
+
+        let a = ZZX::new_with_vec(vec![1, 2, 3]);
+        let c = a >> -1;
+        assert_eq!(c[0], 0);
+        assert_eq!(c[1], 1);
+        assert_eq!(c[2], 2);
+        assert_eq!(c[3], 3);
+    }
 }
