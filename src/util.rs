@@ -1523,3 +1523,41 @@ pub fn reverse(a: &ZZX, hi: i64) -> ZZX {
     _reverse(&mut x, a, hi);
     x
 }
+
+/// s[i] = Trace(X^i mod f), for i = 0..f.deg() - 1
+/// f must be monic polynomial.
+fn _trace_vec(s: &mut Vec<Integer>, f: &ZZX) {
+    if f.lead_coeff() != 1 {
+        panic!("TraceVec: f must be monic");
+    }
+
+    let mut _f = ZZX::new();
+    _f.coeffs = f.coeffs.clone();
+
+    let n = f.deg() as usize;
+
+    s.resize(n, Integer::from(0));
+
+    if n == 0 {
+        return;
+    }
+
+    s[0] = Integer::from(n);
+
+    for k in 1..n {
+        let mut acc = f.coeffs[n - k].clone() * k;
+
+        for i in 1..k {
+            let t = f.coeffs[n - i].clone() * s[k - i].clone();
+            acc = acc + t;
+        }
+
+        s[k] = -acc;
+    }
+}
+
+pub fn trace_vec(f: &ZZX) -> Vec<Integer> {
+    let mut s = Vec::new();
+    _trace_vec(&mut s, f);
+    s
+}
