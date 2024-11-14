@@ -742,7 +742,7 @@ fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
     }
 
     let n = a.coeffs.len();
-    let mut res: Vec<Integer> = Vec::with_capacity(n);
+    let mut res = vec![Integer::from(0); n];
     for i in 0..n {
         let (q, r) = &a.coeffs[i].div_rem_ref(&b).complete();
         if !r.is_zero() {
