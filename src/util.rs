@@ -593,6 +593,16 @@ impl Rem for ZZX {
     }
 }
 
+impl Rem<&ZZX> for &ZZX {
+    type Output = ZZX;
+
+    fn rem(self, rhs: &ZZX) -> Self::Output {
+        let mut res = ZZX::new();
+        rem(&mut res, self, rhs);
+        res
+    }
+}
+
 impl Rem<Integer> for ZZX {
     type Output = ZZX;
 
