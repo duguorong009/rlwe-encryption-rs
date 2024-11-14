@@ -367,7 +367,7 @@ pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     } else {
         let mut r1 = ZZX::new();
         pseudo_rem(&mut r1, a, b);
-        let m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
+        let m = b.lead_coeff().pow((da - db + 1) as u32);
         if !divide_with_integer(r, &r1, &m) {
             panic!("rem: remainder not defined over ZZ");
         }
@@ -492,7 +492,7 @@ fn div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
         let mut r1 = ZZX::new();
         let mut m = Integer::new();
         pseudo_div_rem(&mut q1, &mut r1, a, b);
-        m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
+        m = b.lead_coeff().pow((da - db + 1) as u32);
         if !divide_with_integer(q, &q1, &m) {
             panic!("div_rem: quotient not defined over ZZ");
         }
@@ -537,7 +537,7 @@ fn div(q: &mut ZZX, a: &ZZX, b: &ZZX) {
         let mut q1 = ZZX::new();
         let mut m = Integer::new();
         pseudo_div(&mut q1, a, b);
-        m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
+        m = b.lead_coeff().pow((da - db + 1) as u32);
         if !divide_with_integer(q, &q1, &m) {
             panic!("div: quotient not defined over ZZ");
         }
@@ -695,7 +695,7 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
 
     let dq = da - db;
     let mut q = ZZX::new();
-    q.set_length(dq as usize + 1);
+    q.set_length((dq + 1) as usize);
 
     let mut t = Integer::new();
     for i in (0..=dq).rev() {
@@ -706,7 +706,7 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
                 return false;
             }
         } else {
-            t = xp[i as usize + db as usize].clone();
+            t = xp[(i + db) as usize].clone();
         }
 
         if t.significant_bits() as i64 > coeff_bnd {
@@ -799,7 +799,7 @@ fn mul_with_integer(x: &mut ZZX, a: &ZZX, b: &Integer) {
 
     let t = b.clone();
     let da = a.deg();
-    x.set_length(da as usize + 1);
+    x.set_length((da + 1) as usize);
 
     for i in 0..da + 1 {
         x.coeffs[i as usize] = Integer::from(&a.coeffs[i as usize] * &t);
@@ -996,17 +996,15 @@ fn plain_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     }
 
     let d = da + db;
-    let ap: &Vec<Integer> = &a.coeffs;
-    let bp: &Vec<Integer> = &b.coeffs;
 
-    c.set_length(d as usize + 1);
+    c.set_length((d + 1) as usize);
 
     for i in 0..=d {
         let j_min = 0.max(i - db);
         let j_max = da.min(i);
         let mut accum = Integer::from(0);
         for j in j_min..=j_max {
-            accum += ap[j as usize].clone() * bp[i as usize - j as usize].clone();
+            accum += a.coeffs[j as usize].clone() * b.coeffs[(i - j) as usize].clone();
         }
         c.set_coeff(i as usize, Some(accum));
     }
@@ -1023,7 +1021,7 @@ fn plain_sqr(c: &mut ZZX, a: &ZZX) {
 
     let d = 2 * a.deg();
 
-    c.set_length(d as usize + 1);
+    c.set_length((d + 1) as usize);
 
     for i in 0..=d {
         let j_min = 0.max(i - da);
@@ -1194,9 +1192,9 @@ pub fn add(x: &mut ZZX, a: &ZZX, b: &ZZX) {
     let db = b.deg();
     let maxab = da.max(db);
 
-    x.set_length(maxab as usize + 1);
+    x.set_length((maxab + 1) as usize);
 
-    for i in 0..maxab as usize + 1 {
+    for i in 0..(maxab + 1) as usize {
         let a = if i <= da as usize {
             a.coeffs[i].clone()
         } else {
@@ -1230,9 +1228,9 @@ pub fn sub(x: &mut ZZX, a: &ZZX, b: &ZZX) {
 
     let maxab = da.max(db);
 
-    x.set_length(maxab as usize + 1);
+    x.set_length((maxab + 1) as usize);
 
-    for i in 0..maxab as usize + 1 {
+    for i in 0..(maxab + 1) as usize {
         let a = if i <= da as usize {
             a.coeffs[i].clone()
         } else {
@@ -1402,7 +1400,7 @@ fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
     };
 
     if e == 1 {
-        c.coeffs = ZZX::new_with_val(x).coeffs;
+        c.coeffs = vec![x];
         return;
     }
 
