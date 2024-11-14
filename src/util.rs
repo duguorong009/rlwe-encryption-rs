@@ -1561,3 +1561,34 @@ pub fn trace_vec(f: &ZZX) -> Vec<Integer> {
     _trace_vec(&mut s, f);
     s
 }
+
+/// res = trace of (a mod f)
+/// f must be monic
+fn _trace_mod(res: &mut Integer, a: &ZZX, f: &ZZX) {
+    if f.lead_coeff() != 1 || a.deg() >= f.deg() || f.deg() <= 0 {
+        panic!("TraceMod: bad args");
+    }
+
+    let mut s = Vec::new();
+    _trace_vec(&mut s, f);
+    _inner_product(res, &s, &a.coeffs);
+}
+
+fn trace_mod(a: &ZZX, f: &ZZX) -> Integer {
+    let mut res = Integer::from(0);
+    _trace_mod(&mut res, a, f);
+    res
+}
+
+fn _inner_product(res: &mut Integer, a: &Vec<Integer>, b: &Vec<Integer>) {
+    let n = a.len().min(b.len());
+
+    let mut acc = Integer::from(0);
+
+    for i in 0..n {
+        let t = a[i].clone() * b[i].clone();
+        acc = acc + t;
+    }
+
+    *res = acc;
+}
