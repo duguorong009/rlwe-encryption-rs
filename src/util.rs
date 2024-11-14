@@ -49,11 +49,14 @@ impl ZZX {
 
     /// Strip leading zeros
     pub fn normalize(&mut self) {
-        let mut i = self.coeffs.len() - 1;
-        while i > 0 && self.coeffs[i] == 0 {
-            self.coeffs.pop();
-            i -= 1;
+        let mut n = self.coeffs.len();
+        if n == 0 {
+            return;
         }
+        while n > 0 && self.coeffs[n - 1] == 0 {
+            n -= 1;
+        }
+        self.set_length(n);
     }
 
     pub fn set_length(&mut self, len: usize) {
