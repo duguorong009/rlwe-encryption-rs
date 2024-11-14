@@ -1197,7 +1197,19 @@ pub fn add(x: &mut ZZX, a: &ZZX, b: &ZZX) {
 
 pub fn sub(x: &mut ZZX, a: &ZZX, b: &ZZX) {
     let da = a.deg();
+    if da == -1 {
+        let mut t = ZZX::new();
+        negate(&mut t, b);
+        x.coeffs = t.coeffs.clone();
+        return;
+    }
+    
     let db = b.deg();
+    if db == -1 {
+        x.coeffs = a.coeffs.clone();
+        return;
+    }
+
     let maxab = da.max(db);
 
     x.set_length(maxab as usize + 1);
