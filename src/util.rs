@@ -412,14 +412,14 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
     let mut xp = a.coeffs.clone();
     let dq = da - db;
 
-    q.set_length(dq as usize + 1);
+    q.set_length((dq + 1) as usize);
 
     if !lc_is_one {
         let mut t = lc.clone();
         for i in (0..=dq - 1).rev() {
-            xp[i as usize] = xp[i as usize].clone() * t.clone();
+            xp[i as usize] *= t.clone();
             if i > 0 {
-                t = Integer::from(&t * &lc);
+                t *= lc.clone();
             }
         }
     }
@@ -430,18 +430,18 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
         for j in (0..db).rev() {
             let s = t.clone() * bp[j as usize].clone();
             if !lc_is_one {
-                xp[i as usize + j as usize] = xp[i as usize + j as usize].clone() * lc.clone();
+                xp[(i + j) as usize] *= lc.clone();
             }
-            xp[i as usize + j as usize] = xp[i as usize + j as usize].clone() - s.clone();
+            xp[(i + j) as usize] -= s.clone();
         }
     }
 
     if !lc_is_one {
         let mut t = lc.clone();
         for i in 1..=dq {
-            q.coeffs[i as usize] = q.coeffs[i as usize].clone() * t.clone();
+            q.coeffs[i as usize] *= t.clone();
             if i < dq {
-                t = t.clone() * lc.clone();
+                t *= lc.clone();
             }
         }
     }
@@ -687,8 +687,7 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
         + ((Integer::from(da + 1).significant_bits() + 1) / 2) as i64
         + (da - db);
 
-    let bp = b.coeffs.clone();
-    let lc = bp[db as usize].clone();
+    let lc = b.coeffs[db as usize].clone();
 
     let lc_is_one = lc == 1;
 
@@ -701,7 +700,7 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
     let mut t = Integer::new();
     for i in (0..=dq).rev() {
         if !lc_is_one {
-            let (q, r) = &xp[i as usize + db as usize].div_rem_ref(&lc).complete();
+            let (q, r) = &xp[(i + db) as usize].div_rem_ref(&lc).complete();
             t = q.clone();
             if !r.is_zero() {
                 return false;
@@ -716,8 +715,8 @@ fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
 
         q.coeffs[i as usize] = t.clone();
         for j in (0..db).rev() {
-            let s = Integer::from(&t * &bp[j as usize]);
-            xp[i as usize + j as usize] = Integer::from(&xp[i as usize + j as usize] - &s);
+            let s = Integer::from(&t * &b.coeffs[j as usize]);
+            xp[(i + j) as usize] -= s;
         }
     }
 
@@ -1526,9 +1525,6 @@ fn _trace_vec(s: &mut Vec<Integer>, f: &ZZX) {
     if f.lead_coeff() != 1 {
         panic!("TraceVec: f must be monic");
     }
-
-    let mut _f = ZZX::new();
-    _f.coeffs = f.coeffs.clone();
 
     let n = f.deg() as usize;
 
