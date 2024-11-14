@@ -413,7 +413,6 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
     let dq = da - db;
 
     q.set_length(dq as usize + 1);
-    let mut qp = q.coeffs.clone();
 
     if !lc_is_one {
         let mut t = lc.clone();
@@ -427,7 +426,7 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
 
     for i in (0..=dq).rev() {
         let t = xp[(i + db) as usize].clone();
-        qp[i as usize] = t.clone();
+        q.coeffs[i as usize] = t.clone();
         for j in (0..db).rev() {
             let s = t.clone() * bp[j as usize].clone();
             if !lc_is_one {
@@ -440,7 +439,7 @@ fn plain_pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
     if !lc_is_one {
         let mut t = lc.clone();
         for i in 1..=dq {
-            qp[i as usize] = qp[i as usize].clone() * t.clone();
+            q.coeffs[i as usize] = q.coeffs[i as usize].clone() * t.clone();
             if i < dq {
                 t = t.clone() * lc.clone();
             }
