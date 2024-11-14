@@ -326,6 +326,16 @@ impl Mul for ZZX {
     }
 }
 
+impl Mul<&ZZX> for &ZZX {
+    type Output = ZZX;
+
+    fn mul(self, rhs: &ZZX) -> Self::Output {
+        let mut res = ZZX::new();
+        mul(&mut res, self, rhs);
+        res
+    }
+}
+
 impl MulAssign for ZZX {
     fn mul_assign(&mut self, rhs: Self) {
         let mut output = ZZX::new();
@@ -994,7 +1004,6 @@ fn plain_sqr(c: &mut ZZX, a: &ZZX) {
     }
 
     let d = 2 * a.deg();
-    let ap = &a.coeffs;
 
     c.set_length(d as usize + 1);
 
@@ -1005,15 +1014,14 @@ fn plain_sqr(c: &mut ZZX, a: &ZZX) {
         let m2 = m >> 1;
         let j_max = j_min + m2 - 1;
 
-        let mut accum = Integer::from(0);
-        let mut t = Integer::from(0);
+        let mut accum = Integer::new();
         for j in j_min..=j_max {
-            t = ap[j as usize].clone() * ap[i as usize - j as usize].clone();
+            let t = a.coeffs[j as usize].clone() * a.coeffs[(i - j) as usize].clone();
             accum += t;
         }
         accum *= 2;
         if m & 1 == 1 {
-            t = ap[j_max as usize + 1].clone().square();
+            let t = a.coeffs[(j_max + 1) as usize].square_ref().complete();
             accum += t;
         }
         c.set_coeff(i as usize, Some(accum));
