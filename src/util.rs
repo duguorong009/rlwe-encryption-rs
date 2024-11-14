@@ -37,7 +37,16 @@ impl ZZX {
 
     /// init with vector of coefficients
     pub fn new_with_vec<T: Into<Integer>>(coeffs: Vec<T>) -> Self {
-        let coeffs = coeffs.into_iter().map(Into::into).collect();
+        if coeffs.is_empty() {
+            return ZZX::new();
+        }
+
+        let coeffs: Vec<Integer> = coeffs.into_iter().map(Into::into).collect();
+
+        if coeffs.iter().all(|x| x.is_zero()) {
+            return ZZX::new();
+        }
+
         ZZX { coeffs }
     }
 
