@@ -30,7 +30,7 @@ impl ZZX {
             ZZX::new()
         } else {
             ZZX {
-                coeffs: vec![n.into()],
+                coeffs: vec![n],
             }
         }
     }
@@ -317,7 +317,7 @@ impl Mul for ZZX {
 impl MulAssign for ZZX {
     fn mul_assign(&mut self, rhs: Self) {
         let mut output = ZZX::new();
-        mul(&mut output, &self, &rhs);
+        mul(&mut output, self, &rhs);
         *self = output;
     }
 }
@@ -345,7 +345,7 @@ pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     } else {
         let mut r1 = ZZX::new();
         pseudo_rem(&mut r1, a, b);
-        let m = Integer::from(b.lead_coeff().pow(da as u32 - db as u32 + 1));
+        let m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
         if !divide_with_integer(r, &r1, &m) {
             panic!("rem: remainder not defined over ZZ");
         }
@@ -472,10 +472,10 @@ fn div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
         let mut m = Integer::new();
         pseudo_div_rem(&mut q1, &mut r1, a, b);
         m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
-        if !divide_with_integer(q, &mut q1, &m) {
+        if !divide_with_integer(q, &q1, &m) {
             panic!("div_rem: quotient not defined over ZZ");
         }
-        if !divide_with_integer(r, &mut r1, &m) {
+        if !divide_with_integer(r, &r1, &m) {
             panic!("div_rem: remainder not defined over ZZ");
         }
     }
@@ -517,7 +517,7 @@ fn div(q: &mut ZZX, a: &ZZX, b: &ZZX) {
         let mut m = Integer::new();
         pseudo_div(&mut q1, a, b);
         m = b.lead_coeff().pow(da as u32 - db as u32 + 1);
-        if !divide_with_integer(q, &mut q1, &m) {
+        if !divide_with_integer(q, &q1, &m) {
             panic!("div: quotient not defined over ZZ");
         }
     }
@@ -722,11 +722,11 @@ fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
     let n = a.coeffs.len();
     let mut res: Vec<Integer> = Vec::with_capacity(n);
     for i in 0..n {
-        let (q, r) = a.coeffs[i].clone().div_rem(b.clone());
+        let (q, r) = &a.coeffs[i].div_rem_ref(&b).complete();
         if !r.is_zero() {
             return false;
         }
-        res[i] = q;
+        res[i] = q.clone();
     }
 
     q.coeffs = res;
@@ -1394,7 +1394,7 @@ fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
         g2 = trunc(&g2, l);
         g2 = left_shift(&g2, k);
 
-        g = g - g2;
+        g -= g2;
     }
 
     c.coeffs = g.coeffs;
@@ -1494,7 +1494,7 @@ fn _trace_vec(s: &mut Vec<Integer>, f: &ZZX) {
 
         for i in 1..k {
             let t = f.coeffs[n - i].clone() * s[k - i].clone();
-            acc = acc + t;
+            acc += t;
         }
 
         s[k] = -acc;
@@ -1525,14 +1525,14 @@ fn trace_mod(a: &ZZX, f: &ZZX) -> Integer {
     res
 }
 
-fn _inner_product(res: &mut Integer, a: &Vec<Integer>, b: &Vec<Integer>) {
+fn _inner_product(res: &mut Integer, a: &[Integer], b: &[Integer]) {
     let n = a.len().min(b.len());
 
     let mut acc = Integer::from(0);
 
     for i in 0..n {
         let t = a[i].clone() * b[i].clone();
-        acc = acc + t;
+        acc += t;
     }
 
     *res = acc;
