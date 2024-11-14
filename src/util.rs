@@ -974,49 +974,6 @@ fn plain_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     c.normalize();
 }
 
-fn kar_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    if a.is_zero() || b.is_zero() {
-        c.clear();
-        return;
-    }
-
-    if a == b {
-        kar_sqr(c, a);
-        return;
-    }
-
-    let sa = a.coeffs.len();
-    let sb = b.coeffs.len();
-
-    c.set_length(sa + sb - 1);
-
-    let maxa = a.max_bits();
-    let maxb = b.max_bits();
-    let xover = 2;
-
-    if sa < xover || sb < xover {
-        // _plain_mul_in_(&c.coeffs, &a.coeffs, sa, &b.coeffs, sb);
-        todo!()
-    } else {
-        /* karatsuba */
-        todo!()
-    }
-
-    c.normalize();
-}
-
-fn ss_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    todo!("impl `void ss_mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
-}
-
-fn hom_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
-    todo!("impl `void hom_mul(ZZX& c, const ZZX& a, const ZZX& b)` func");
-}
-
-fn choose_ss(a_deg: i64, a_max_bits: u32, b_deg: i64, b_max_bits: u32) -> bool {
-    todo!("impl `bool choose_ss(int a_deg, int a_max_bits, int b_deg, int b_max_bits)` func");
-}
-
 fn plain_sqr(c: &mut ZZX, a: &ZZX) {
     let da = a.deg();
     if da < 0 {
@@ -1050,18 +1007,6 @@ fn plain_sqr(c: &mut ZZX, a: &ZZX) {
         c.set_coeff(i as usize, Some(accum));
     }
     c.normalize();
-}
-
-fn kar_sqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void kar_sqr(ZZX& c, const ZZX& a)` func");
-}
-
-fn ss_sqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void ss_sqr(ZZX& c, const ZZX& a)` func");
-}
-
-fn hom_sqr(c: &mut ZZX, a: &ZZX) {
-    todo!("impl `void hom_sqr(ZZX& c, const ZZX& a)` func");
 }
 
 /// x = a % X^m
