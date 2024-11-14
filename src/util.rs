@@ -563,6 +563,16 @@ impl Div for ZZX {
     }
 }
 
+impl Div<&ZZX> for &ZZX {
+    type Output = ZZX;
+
+    fn div(self, rhs: &ZZX) -> Self::Output {
+        let mut res = ZZX::new();
+        div(&mut res, self, rhs);
+        res
+    }
+}
+
 impl Div<Integer> for ZZX {
     type Output = ZZX;
 
