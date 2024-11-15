@@ -1,6 +1,9 @@
 use rug::{Float, Integer};
 
-use crate::{sampling::Sampling, util::{add, mulmod, ZZX}};
+use crate::{
+    sampling::Sampling,
+    util::{add, mulmod, ZZX},
+};
 
 #[derive(Debug, Clone)]
 pub struct EncryptionScheme {
@@ -35,14 +38,10 @@ impl EncryptionScheme {
         }
     }
 
-    fn _Mod(&self, a: &mut ZZX) {
+    fn _mod(&self, a: &mut ZZX) {
         for i in 0..self.p as usize {
-            a.set_coeff(i, Some(Self::_mod(a.coeff(i).clone(), self.q.into())));
+            a.set_coeff(i, Some(_mod(a.coeff(i).clone(), self.q.into())));
         }
-    }
-
-    fn _mod(i: Integer, n: Integer) -> Integer {
-        (i % n.clone() + n.clone()) % n
     }
 }
 
@@ -94,7 +93,7 @@ impl EncryptionScheme {
         c = mulmod(a, r2, &self.f);
         *p1 = r1 - c;
 
-        self._Mod(p1);
+        self._mod(p1);
     }
 
     fn encode(&self, aprime: &mut ZZX, a: Vec<i32>) {
@@ -143,8 +142,8 @@ impl EncryptionScheme {
         mult = mulmod(a, &e1, &self.f);
         *c1 = mult + e2;
 
-        self._Mod(c1);
-        self._Mod(c2);
+        self._mod(c1);
+        self._mod(c2);
     }
 
     fn decrtyption(&self, m: &mut ZZX, c1: &ZZX, c2: &ZZX, r2: &ZZX) {
@@ -156,6 +155,10 @@ impl EncryptionScheme {
         mult = mulmod(c1, r2, &self.f);
         *m = mult - c2;
 
-        self._Mod(m);
+        self._mod(m);
     }
+}
+
+fn _mod(i: Integer, n: Integer) -> Integer {
+    (i % n.clone() + n.clone()) % n
 }
