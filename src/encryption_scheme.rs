@@ -143,7 +143,15 @@ impl EncryptionScheme {
         self._Mod(c2);
     }
 
-    fn decrtyption(m: &ZZX, c1: &ZZX, c2: &ZZX, r2: &ZZX) {
-        todo!("impl `void Decryption(ZZX& m, const ZZX& c1, const ZZX& c2, const ZZX& r2)` func");
+    fn decrtyption(&self, m: &mut ZZX, c1: &ZZX, c2: &ZZX, r2: &ZZX) {
+        let mut mult = ZZX::new();
+        mult.set_length(self.p as usize);
+
+        m.set_length(self.p as usize);
+
+        mult = mulmod(c1, r2, &self.f);
+        *m = mult - c2;
+
+        self._Mod(m);
     }
 }
