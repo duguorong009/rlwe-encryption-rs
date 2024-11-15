@@ -93,8 +93,13 @@ impl EncryptionScheme {
         self._Mod(p1);
     }
 
-    fn encode(aprime: &ZZX, a: Vec<i32>) {
-        todo!("impl `void Encode(ZZX& aprime, const int32_t a[])` func");
+    fn encode(&self, aprime: &mut ZZX, a: Vec<i32>) {
+        aprime.set_length(self.p as usize);
+
+        let bound = (self.q - 1) / 2;
+        for i in 0..self.p as usize {
+            aprime[i] = Integer::from(a[i] * bound);
+        }
     }
 
     fn decode(a: Vec<i32>, aprime: &ZZX) {
