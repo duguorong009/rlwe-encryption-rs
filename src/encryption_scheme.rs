@@ -18,10 +18,6 @@ pub struct EncryptionScheme {
 }
 
 impl EncryptionScheme {
-    fn set_F() {
-        todo!("impl `void SetF()` func");
-    }
-
     fn poly_sampling(&self, a: &mut ZZX) {
         // TODO: check if match c code
         // int bound = ((int)tailcut)*to_int(sigma);
@@ -59,6 +55,14 @@ impl EncryptionScheme {
         f.set_coeff(p as usize, Some(1));
         f.set_coeff(1, Some(-1));
         f.set_coeff(0, Some(-1));
+
+        // f[6] = Integer::from(1);
+        // f[5] = Integer::from(1);
+        // f[4] = Integer::from(-5);
+        // f[3] = Integer::from(-4);
+        // f[2] = Integer::from(6);
+        // f[1] = Integer::from(3);
+        // f[0] = Integer::from(-1);
 
         let gauss = Sampling::new(preicsion, tailcut, sigma.clone(), center.clone());
 
