@@ -102,8 +102,17 @@ impl EncryptionScheme {
         }
     }
 
-    fn decode(a: Vec<i32>, aprime: &ZZX) {
-        todo!("impl `void Decode(int32_t a[], const ZZX& aprime)` func");
+    fn decode(&self, a: &mut Vec<i32>, aprime: &ZZX) {
+        let lbound = Integer::from((self.q - 1) / 4);
+        let ubound = Integer::from(3 * lbound.clone());
+
+        for i in 0..self.p as usize {
+            if aprime[i] >= lbound && aprime[i] < ubound {
+                a[i] = 1;
+            } else {
+                a[i] = 0;
+            }
+        }
     }
 
     fn encryption(c1: &ZZX, c2: &ZZX, a: &ZZX, p1: &ZZX, m: &ZZX) {
