@@ -1,6 +1,6 @@
 use rug::{Float, Integer};
 
-use crate::{sampling::Sampling, util::{mulmod, ZZX}};
+use crate::{sampling::Sampling, util::{add, mulmod, ZZX}};
 
 #[derive(Debug, Clone)]
 pub struct EncryptionScheme {
@@ -115,8 +115,32 @@ impl EncryptionScheme {
         }
     }
 
-    fn encryption(c1: &ZZX, c2: &ZZX, a: &ZZX, p1: &ZZX, m: &ZZX) {
-        todo!("impl `void Encryption(ZZX& c1, ZZX& c2, const ZZX& a, const ZZX& p1, const ZZX& m)` func");
+    fn encryption(&self, c1: &mut ZZX, c2: &mut ZZX, a: &ZZX, p1: &ZZX, m: &ZZX) {
+        c1.set_length(self.p as usize);
+        c2.set_length(self.p as usize);
+
+        let mut add = ZZX::new();
+        add.set_length(self.p as usize);
+
+        let mut mult = ZZX::new();
+        mult.set_length(self.p as usize);
+
+        let mut e1 = ZZX::new();
+        let mut e2 = ZZX::new();
+        let mut e3 = ZZX::new();
+
+        self.poly_sampling(&mut e1);
+        self.poly_sampling(&mut e2);
+        self.poly_sampling(&mut e3);
+
+        add = e3 + m;
+        mult = mulmod(p1, &e1, &self.f);
+        *c2 = &mult + &add;
+        mult = mulmod(a, &e1, &self.f);
+        *c1 = mult + e2;
+
+        self._Mod(c1);
+        self._Mod(c2);
     }
 
     fn decrtyption(m: &ZZX, c1: &ZZX, c2: &ZZX, r2: &ZZX) {
