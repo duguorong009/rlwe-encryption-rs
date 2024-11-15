@@ -1,6 +1,6 @@
 use rug::{Float, Integer};
 
-use crate::{sampling::Sampling, util::ZZX};
+use crate::{sampling::Sampling, util::{mulmod, ZZX}};
 
 #[derive(Debug, Clone)]
 pub struct EncryptionScheme {
@@ -87,8 +87,8 @@ impl EncryptionScheme {
         self.poly_sampling(&mut r1);
         self.poly_sampling(r2);
 
-        // NTL::MulMod(c, a, r2, f);
-        // NTL::sub(p1, r1, c);
+        c = mulmod(a, r2, &self.f);
+        *p1 = r1 - c;
 
         self._Mod(p1);
     }
