@@ -2,7 +2,7 @@ use rug::{Float, Integer};
 
 use crate::{
     sampling::Sampling,
-    util::{add, mulmod, ZZX},
+    util::zzx::{mulmod, ZZX},
 };
 
 #[derive(Debug, Clone)]
