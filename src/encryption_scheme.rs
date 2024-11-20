@@ -46,7 +46,7 @@ impl EncryptionScheme {
 }
 
 impl EncryptionScheme {
-    pub fn new(p: i32, q: i32, preicsion: u64, tailcut: f32, sigma: Float, center: Float) -> Self {
+    pub fn new(p: i32, q: i32, preicsion: u32, tailcut: f32, sigma: Float, center: Float) -> Self {
         // RR::SetPrecision(to_long(precision));
 
         let mut f = ZZX::new();
