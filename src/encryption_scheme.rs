@@ -96,7 +96,7 @@ impl EncryptionScheme {
         self._mod(p1);
     }
 
-    fn encode(&self, aprime: &mut ZZX, a: Vec<i32>) {
+    pub fn encode(&self, aprime: &mut ZZX, a: Vec<i32>) {
         aprime.set_length(self.p as usize);
 
         let bound = (self.q - 1) / 2;
@@ -105,7 +105,7 @@ impl EncryptionScheme {
         }
     }
 
-    fn decode(&self, a: &mut Vec<i32>, aprime: &ZZX) {
+    pub fn decode(&self, a: &mut Vec<i32>, aprime: &ZZX) {
         let lbound = Integer::from((self.q - 1) / 4);
         let ubound = Integer::from(3 * lbound.clone());
 
@@ -118,7 +118,7 @@ impl EncryptionScheme {
         }
     }
 
-    fn encryption(&self, c1: &mut ZZX, c2: &mut ZZX, a: &ZZX, p1: &ZZX, m: &ZZX) {
+    pub fn encryption(&self, c1: &mut ZZX, c2: &mut ZZX, a: &ZZX, p1: &ZZX, m: &ZZX) {
         c1.set_length(self.p as usize);
         c2.set_length(self.p as usize);
 
@@ -146,7 +146,7 @@ impl EncryptionScheme {
         self._mod(c2);
     }
 
-    fn decrtyption(&self, m: &mut ZZX, c1: &ZZX, c2: &ZZX, r2: &ZZX) {
+    pub fn decryption(&self, m: &mut ZZX, c1: &ZZX, c2: &ZZX, r2: &ZZX) {
         let mut mult = ZZX::new();
         mult.set_length(self.p as usize);
 
