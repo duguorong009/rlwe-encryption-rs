@@ -1,3 +1,5 @@
+use util::{randombits_u64, zzx::*};
+
 mod encryption_scheme;
 mod sampling;
 mod util;
@@ -19,4 +21,13 @@ const SIGMA: f32 = 2.0;
 
 fn main() {
     println!("Hello, world!");
+}
+
+fn random_poly() -> ZZX {
+    let mut a = ZZX::new();
+    a.set_length(P);
+    for i in 0..P {
+        a[i] = randombits_u64(((Q as f64).log2() as u32) / 4).into();
+    }
+    a
 }
