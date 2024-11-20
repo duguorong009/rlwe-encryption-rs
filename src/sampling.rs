@@ -11,14 +11,14 @@ pub const COLS: usize = 40;
 pub struct Sampling {
     p: Vec<Vec<i32>>,
     begin: Vec<i32>,
-    precision: u64,
+    precision: u32,
     tailcut: f32,
     sigma: Float,
     c: Float,
 }
 
 impl Sampling {
-    pub fn new(precision: u64, tailcut: f32, sigma: Float, center: Float) -> Self {
+    pub fn new(precision: u32, tailcut: f32, sigma: Float, center: Float) -> Self {
         let mut sampling = Self {
             p: vec![],
             begin: vec![],
@@ -94,16 +94,16 @@ impl Sampling {
         let mut prob_of_x: Vec<Float> = vec![];
 
         let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as usize;
-        prob_of_x.reserve_exact(bound + 1);
-        aux_p.reserve_exact(self.precision as usize);
+        prob_of_x.resize_with(bound + 1, || Float::with_val(self.precision, 0));
+        aux_p.resize_with(self.precision as usize, || vec![]);
 
         for i in 0..aux_p.len() {
-            aux_p[i].reserve_exact(bound + 1);
+            aux_p[i].resize_with(bound + 1, || 0);
         }
 
         for x in (1..=bound).rev() {
             prob_of_x[bound - x] = self.probability(
-                Float::with_val(32, x) + self.c.clone(),
+                Float::with_val(self.precision, x) + self.c.clone(),
                 self.sigma.clone(),
                 self.c.clone(),
             );
@@ -134,7 +134,7 @@ impl Sampling {
         let p_num_cols = self.p[0].len();
         let p_num_rows = self.p.len();
 
-        aux_begin.reserve_exact(p_num_rows);
+        aux_begin.resize_with(p_num_rows, || 0);
 
         // computing in which position the non-zero values in P start and end
         for i in 0..p_num_rows {
