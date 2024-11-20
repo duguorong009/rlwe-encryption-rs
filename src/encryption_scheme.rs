@@ -96,7 +96,7 @@ impl EncryptionScheme {
         self._mod(p1);
     }
 
-    pub fn encode(&self, aprime: &mut ZZX, a: Vec<i32>) {
+    pub fn encode(&self, aprime: &mut ZZX, a: &[i32]) {
         aprime.set_length(self.p as usize);
 
         let bound = (self.q - 1) / 2;

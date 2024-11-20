@@ -33,8 +33,9 @@ fn main() {
     let tail_cut = 13.2;
 
     let mut total_errors = 0;
-
-    let mut es = EncryptionScheme::new(P as i32, Q as i32, precision, tail_cut, SIGMA.into(), center);
+    
+    let sigma = RR::with_val(precision, SIGMA);
+    let mut es = EncryptionScheme::new(P as i32, Q as i32, precision as u64, tail_cut, sigma, center);
 
     /* key generation */
     let a = random_poly();
@@ -49,7 +50,7 @@ fn main() {
 
         // encryption
         let mut mprime = ZZX::new();
-        es.encode(&mut mprime, m);
+        es.encode(&mut mprime, &m);
 
         let mut c1 = ZZX::new();
         let mut c2 = ZZX::new();
