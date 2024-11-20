@@ -1,4 +1,4 @@
-use util::{randombits_u64, zzx::*};
+use util::{randombits_i64, randombits_u64, zzx::*};
 
 mod encryption_scheme;
 mod sampling;
@@ -28,6 +28,14 @@ fn random_poly() -> ZZX {
     a.set_length(P);
     for i in 0..P {
         a[i] = randombits_u64(((Q as f64).log2() as u32) / 4).into();
+    }
+    a
+}
+
+fn random_message() -> Vec<i32> {
+    let mut a = Vec::new();
+    for _ in 0..P {
+        a.push(randombits_i64(1) as i32);
     }
     a
 }
