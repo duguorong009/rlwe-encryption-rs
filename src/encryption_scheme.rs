@@ -80,7 +80,7 @@ impl EncryptionScheme {
         orig.clone()
     }
 
-    fn key_generation(&self, a: &ZZX, r2: &mut ZZX, p1: &mut ZZX) {
+    pub fn key_generation(&self, a: &ZZX, r2: &mut ZZX, p1: &mut ZZX) {
         let mut c: ZZX = ZZX::new();
         let mut r1: ZZX = ZZX::new();
 
