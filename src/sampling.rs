@@ -4,6 +4,8 @@ use rug::{
     Float,
 };
 
+use crate::util::randombits_i64;
+
 pub const ROWS: usize = 128;
 pub const COLS: usize = 40;
 
@@ -38,8 +40,7 @@ impl Sampling {
         let center = self.c.to_f32().round() as i32;
         let mut d = 0; // distance
         let mut hit = 0;
-        // let signal = 1 - 2 * RandomBits_long(1); // Sample a random signal s
-        let signal = 1 - 2 * 1;
+        let signal = 1 - 2 * randombits_i64(1) as i32; // Sample a random signal s
         let invalid_sample = bound + 1;
         let p_num_rows = self.p.len(); // precision
         let p_num_cols = self.p[0].len();
@@ -50,7 +51,7 @@ impl Sampling {
 
         let mut index = 0;
         for _ in 0..(p_num_rows / length + 1) {
-            let mut r: u64 = 0; // RandomWord(); // It returns a word filled with pseudo-random bits
+            let mut r: u64 = rand::random::<u64>(); // RandomWord(); // It returns a word filled with pseudo-random bits
             let mut j = 0;
             while j < length && index < p_num_rows {
                 random_bits[index] = (r & 1) as i32; // getting the least significant bit
@@ -193,8 +194,7 @@ impl Sampling {
     }
 
     // bit = 0 then return a
-    fn select(a: i32, b: i32, bit: u32) -> i32 {
-        let mask = -(bit as i32);
-        (mask & (a ^ b)) ^ a
+    fn select(a: i32, b: i32, bit: bool) -> i32 {
+        if bit { b } else { a }
     }
 }
