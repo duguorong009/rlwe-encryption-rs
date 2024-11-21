@@ -67,13 +67,13 @@ impl Sampling {
             d = 2 * d + random_bits[row]; // Distance calculus
             for col in self.begin[row] as usize..p_num_cols {
                 d = d - self.p[row][col];
-                let mut enable = (d + 1) as i32; // "enable" turns 0 iff d = -1
-                enable = (1 ^ ((enable | -enable) >> 31)) & 1; // "enable" turns 1 iff "enable" was 0
+                let mut enable = (d + 1) != 0; // "enable" turns 0 iff d = -1
+                enable = !enable; // "enable" turns 1 iff "enable" was 0
 
                 // when enable & !hit becomes 1, "col" is added to "S";
                 // e.g. enable = 1 and hit = 0
-                s += Sampling::select(invalid_sample as i32, col as i32, (enable & !hit) as u32);
-                hit += (enable & hit) as i32;
+                s += select(invalid_sample as i32, col as i32, enable & (hit == 0));
+                hit += (enable & (hit != 0)) as i32;
             }
         }
 
@@ -154,8 +154,8 @@ impl Sampling {
 
     fn probability(&self, x: Float, sigma: Float, c: Float) -> Float {
         let pi = Float::with_val(32, Constant::Pi);
-        let mut s: Float = sigma.clone() * (Float::with_val(32, 2) * pi).sqrt();
-        let mut over_s: Float = 1 / s;
+        let s: Float = sigma.clone() * (Float::with_val(self.precision, 2) * pi).sqrt();
+        let over_s: Float = 1 / s;
 
         if x == 0 {
             return over_s;
@@ -192,9 +192,13 @@ impl Sampling {
             j += 1;
         }
     }
+}
 
-    // bit = 0 then return a
-    fn select(a: i32, b: i32, bit: bool) -> i32 {
-        if bit { b } else { a }
+// bit = 0 then return a
+fn select(a: i32, b: i32, bit: bool) -> i32 {
+    if bit {
+        b
+    } else {
+        a
     }
 }
