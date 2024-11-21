@@ -21,7 +21,7 @@ const SIGMA: f32 = 3.19;
 // const Q: usize = 4591;
 // const SIGMA: f32 = 2.0;
 
-const BENCH_LOOPS: usize = 1000; 
+const BENCH_LOOPS: usize = 1000;
 
 fn main() {
     // ZZ_p::init(to_ZZ(Q));
@@ -29,13 +29,13 @@ fn main() {
     println!("---------------------\nRing-LWE encryption scheme\n---------------------\n");
 
     let precision = 256;
-    let center = RR::new(0);
+    let center = RR::with_val(precision, 0);
     let tail_cut = 13.2;
 
     let mut total_errors = 0;
-    
+
     let sigma = RR::with_val(precision, SIGMA);
-    let mut es = EncryptionScheme::new(P as i32, Q as i32, precision as u64, tail_cut, sigma, center);
+    let es = EncryptionScheme::new(P as i32, Q as i32, precision, tail_cut, sigma, center);
 
     /* key generation */
     let a = random_poly();
@@ -43,7 +43,7 @@ fn main() {
     let mut p1 = ZZX::new();
     es.key_generation(&a, &mut r2, &mut p1);
 
-    for k in 0..BENCH_LOOPS {
+    for _ in 0..BENCH_LOOPS {
         let m = random_message();
 
         println!("Message being encrypted: {:?}\n", m);
@@ -85,7 +85,7 @@ fn main() {
         } else {
             println!("{} executions have failed.", total_errors);
         }
-        
+
         if total_errors == BENCH_LOOPS {
             println!("All executions have failed.");
         }
