@@ -1,4 +1,5 @@
 pub mod zzx;
+pub mod zz_p;
 
 use rand::Rng;
 
