@@ -17,3 +17,10 @@ struct ZZ_pFFTInfoT {
     reduct_struct: ZZ_ReductStructAdapter,
 }
 
+struct ZZ_pInfoT {
+    p: ZZ, // the modulus
+    size: u64, // p.size()
+    extended_modulus_size: u64,
+
+    fft_info: ZZ_pFFTInfoT,
+}
