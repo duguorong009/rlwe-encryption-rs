@@ -22,7 +22,7 @@ struct ZZ_pInfoT {
     size: u64, // p.size()
     extended_modulus_size: u64,
 
-    fft_info: ZZ_pFFTInfoT,
+    fft_info: ZZ_pFFTInfoT, // Lazy<ZZ_pFFTInfoT> FFTInfo; # in C++
 }
 
 struct ZZ_pTmpSpaceT {
@@ -31,5 +31,5 @@ struct ZZ_pTmpSpaceT {
 }
 
 struct ZZ_pContext {
-    info: ZZ_pInfoT,
+    info: ZZ_pInfoT, // SmartPtr<ZZ_pInfoT> ptr; # in C++
 }
