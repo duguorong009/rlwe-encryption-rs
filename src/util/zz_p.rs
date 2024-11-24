@@ -33,3 +33,17 @@ struct ZZ_pTmpSpaceT {
 struct ZZ_pContext {
     info: ZZ_pInfoT, // SmartPtr<ZZ_pInfoT> ptr; # in C++
 }
+
+impl ZZ_pContext {
+    pub fn new(p: ZZ) {
+        todo!();
+    }
+
+    pub fn save() {
+        todo!();
+    }
+
+    pub fn restore() {
+        todo!();
+    }
+}
