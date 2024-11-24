@@ -29,3 +29,7 @@ struct ZZ_pTmpSpaceT {
     crt_tmp_vec: ZZ_TmpVecAdapter,
     rem_tmp_vec: ZZ_TmpVecAdapter,
 }
+
+struct ZZ_pContext {
+    info: ZZ_pInfoT,
+}
