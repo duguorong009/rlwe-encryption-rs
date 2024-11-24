@@ -24,3 +24,8 @@ struct ZZ_pInfoT {
 
     fft_info: ZZ_pFFTInfoT,
 }
+
+struct ZZ_pTmpSpaceT {
+    crt_tmp_vec: ZZ_TmpVecAdapter,
+    rem_tmp_vec: ZZ_TmpVecAdapter,
+}
