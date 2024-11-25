@@ -66,3 +66,13 @@ impl ZZ_pBak {
         todo!();
     }
 }
+
+struct ZZ_pPush {
+    bak: ZZ_pBak,
+}
+
+impl ZZ_pPush {
+    pub fn new() -> Self {
+        todo!();
+    }
+}
