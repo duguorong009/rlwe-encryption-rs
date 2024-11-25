@@ -47,3 +47,22 @@ impl ZZ_pContext {
         todo!();
     }
 }
+
+struct ZZ_pBak {
+    c: ZZ_pContext,
+    must_restore: bool,
+}
+
+impl ZZ_pBak {
+    pub fn new() -> Self {
+        todo!();
+    }
+
+    pub fn save() {
+        todo!();
+    }
+
+    pub fn restore() {
+        todo!();
+    }
+}
