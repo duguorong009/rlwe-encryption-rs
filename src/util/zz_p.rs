@@ -76,3 +76,16 @@ impl ZZ_pPush {
         todo!();
     }
 }
+
+thread_local! {
+    // info for current modulus, initially null
+    // plain pointer for faster TLS access
+    pub static ZZ_pInfo: RefCell<Option<ZZ_pInfoT>> = RefCell::new(None);
+
+    // space for temps associated with current modulus, 
+    // plain pointer for faster TLS access
+    pub static ZZ_pTmpSpace: RefCell<Option<ZZ_pTmpSpaceT>> = RefCell::new(None);
+
+    // flag indicating if current modulus is fully installed
+    pub static ZZ_pInstalled: Cell<bool> = Cell::new(false);
+}
