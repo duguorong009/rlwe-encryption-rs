@@ -1,4 +1,4 @@
-use std::{cell::{Cell, OnceCell, RefCell}, rc::Rc};
+use std::{cell::{Cell, OnceCell, RefCell}, rc::Rc, sync::{Arc, LazyLock, Mutex, OnceLock}};
 use rug::Integer as ZZ;
 
 struct ZZ_pFFTInfoT {
@@ -23,7 +23,7 @@ struct ZZ_pInfoT {
     size: usize, // p.size()
     extended_modulus_size: usize,
 
-    fft_info: OnceCell<ZZ_pFFTInfoT>, // Lazy<ZZ_pFFTInfoT> FFTInfo; # in C++
+    fft_info: OnceLock<ZZ_pFFTInfoT>, // Lazy<ZZ_pFFTInfoT> FFTInfo; # in C++
 }
 
 impl ZZ_pInfoT {
@@ -40,7 +40,7 @@ impl ZZ_pInfoT {
             p,
             size,
             extended_modulus_size,
-            fft_info: OnceCell::new(),
+            fft_info: OnceLock::new(),
         }
     }
 }
@@ -96,6 +96,9 @@ impl ZZ_pPush {
         todo!();
     }
 }
+
+pub static ZZ_P_INFO_STG: LazyLock<Mutex<Option<Arc<ZZ_pInfoT>>>> = LazyLock::new(|| Mutex::new(None));
+pub static ZZ_P_TMP_SPACE_STG: LazyLock<Mutex<Option<Arc<ZZ_pTmpSpaceT>>>> = LazyLock::new(|| Mutex::new(None));
 
 thread_local! {
     // info for current modulus, initially null
