@@ -1,3 +1,4 @@
+use std::{cell::{Cell, OnceCell, RefCell}, rc::Rc};
 use rug::Integer as ZZ;
 
 struct ZZ_pFFTInfoT {
@@ -19,10 +20,29 @@ struct ZZ_pFFTInfoT {
 
 struct ZZ_pInfoT {
     p: ZZ, // the modulus
-    size: u64, // p.size()
-    extended_modulus_size: u64,
+    size: usize, // p.size()
+    extended_modulus_size: usize,
 
-    fft_info: ZZ_pFFTInfoT, // Lazy<ZZ_pFFTInfoT> FFTInfo; # in C++
+    fft_info: OnceCell<ZZ_pFFTInfoT>, // Lazy<ZZ_pFFTInfoT> FFTInfo; # in C++
+}
+
+impl ZZ_pInfoT {
+    pub fn new(p: ZZ) -> Self {
+        if p <= 1 {
+            panic!("ZZ_pContext: p must be > 1");
+        }
+
+        let p = p;
+        let size = p.significant_digits::<u64>();
+        let extended_modulus_size = 2 * size + (64 + 64 - 1) / 64;
+
+        Self {
+            p,
+            size,
+            extended_modulus_size,
+            fft_info: OnceCell::new(),
+        }
+    }
 }
 
 struct ZZ_pTmpSpaceT {
@@ -31,7 +51,7 @@ struct ZZ_pTmpSpaceT {
 }
 
 struct ZZ_pContext {
-    info: ZZ_pInfoT, // SmartPtr<ZZ_pInfoT> ptr; # in C++
+    info: Rc<ZZ_pInfoT>, // SmartPtr<ZZ_pInfoT> ptr; # in C++
 }
 
 impl ZZ_pContext {
