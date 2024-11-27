@@ -15,3 +15,15 @@ impl ZZ_pContext {
         &self.p
     }
 }
+
+#[derive(Debug, Clone)]
+struct ZZ_p {
+    value: ZZ,
+    context: ZZ_pContext,
+}
+
+impl ZZ_p {
+    fn new(value: ZZ, context: ZZ_pContext) -> Self {
+        Self { value, context }
+    }
+}
