@@ -6,9 +6,6 @@ use rug::{
 
 use crate::util::randombits_i64;
 
-pub const ROWS: usize = 128;
-pub const COLS: usize = 40;
-
 #[derive(Debug, Clone)]
 pub struct Sampling {
     p: Vec<Vec<i32>>,
@@ -38,42 +35,43 @@ impl Sampling {
     pub fn knuth_yao(&self) -> i32 {
         let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as usize;
         let center = self.c.to_f32().round() as i32;
-        let mut d = 0; // distance
-        let mut hit = 0;
-        let signal = 1 - 2 * randombits_i64(1) as i32; // Sample a random signal s
-        let invalid_sample = bound + 1;
         let p_num_rows = self.p.len(); // precision
         let p_num_cols = self.p[0].len();
-
+        
         let mut random_bits: Vec<i32> = vec![0; p_num_rows];
-
+        
         let length = 64; // sizeof(unsigned long)*8 // 64 bits
-
+        
         let mut index = 0;
         for _ in 0..(p_num_rows / length + 1) {
             let mut r: u64 = rand::random::<u64>(); // RandomWord(); // It returns a word filled with pseudo-random bits
             let mut j = 0;
             while j < length && index < p_num_rows {
                 random_bits[index] = (r & 1) as i32; // getting the least significant bit
-
+                
                 j += 1;
                 index += 1;
                 r = r >> 1;
             }
         }
+        
+        let mut d = 0; // distance
+        let invalid_sample = bound + 1;
+        let signal = 1 - 2 * randombits_i64(1) as i32; // Sample a random signal s
+        let mut hit = false;
 
         let mut s = 0;
         for row in 0..p_num_rows {
             d = 2 * d + random_bits[row]; // Distance calculus
             for col in self.begin[row] as usize..p_num_cols {
                 d = d - self.p[row][col];
-                let mut enable = (d + 1) != 0; // "enable" turns 0 iff d = -1
-                enable = !enable; // "enable" turns 1 iff "enable" was 0
+
+                let enable = d == -1;
 
                 // when enable & !hit becomes 1, "col" is added to "S";
                 // e.g. enable = 1 and hit = 0
-                s += select(invalid_sample as i32, col as i32, enable & (hit == 0));
-                hit += (enable & (hit != 0)) as i32;
+                s += select(invalid_sample as i32, col as i32, enable & !hit);
+                hit |= enable & !hit;
             }
         }
 
@@ -111,17 +109,17 @@ impl Sampling {
         }
 
         prob_of_x[bound] = self.probability(
-            Float::with_val(32, 0) + self.c.clone(),
+            Float::with_val(self.precision, 0) + self.c.clone(),
             self.sigma.clone(),
             self.c.clone(),
         );
-        prob_of_x[bound].div_assign_round(Float::with_val(32, 2), Round::Nearest);
+        prob_of_x[bound].div_assign_round(Float::with_val(self.precision, 2), Round::Nearest);
 
         let mut i = -1;
         for j in 0..self.precision as usize {
-            let pow: Float = Float::with_val(32, 2).pow(i); // 2^{i}
+            let pow: Float = Float::with_val(self.precision, 2).pow(i); // 2^{i}
             i -= 1;
-            for x in (1..=bound).rev() {
+            for x in (0..=bound).rev() {
                 aux_p[j][bound - x] = 0;
                 if prob_of_x[bound - x] >= pow.clone() {
                     aux_p[j][bound - x] = 1;
@@ -153,7 +151,7 @@ impl Sampling {
     }
 
     fn probability(&self, x: Float, sigma: Float, c: Float) -> Float {
-        let pi = Float::with_val(32, Constant::Pi);
+        let pi = Float::with_val(self.precision, Constant::Pi);
         let s: Float = sigma.clone() * (Float::with_val(self.precision, 2) * pi).sqrt();
         let over_s: Float = 1 / s;
 
@@ -164,7 +162,7 @@ impl Sampling {
         // over_s * exp(-(power((x - c) / sigma, 2)) / 2.0)
         let tmp = (x - c) / sigma;
         let tmp2 = tmp.clone() * tmp;
-        let tmp3 = -(tmp2 / Float::with_val(32, 2.0));
+        let tmp3 = -(tmp2 / Float::with_val(self.precision, 2.0));
         let tmp4 = tmp3.exp();
         over_s * tmp4
     }
