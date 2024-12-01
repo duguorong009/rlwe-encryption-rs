@@ -35,7 +35,7 @@ fn main() {
     let mut total_errors = 0;
 
     let sigma = RR::with_val(precision, SIGMA);
-    let es = EncryptionScheme::new(P as i32, Q as i32, precision, tail_cut, sigma, center);
+    let es = EncryptionScheme::new(P as i64, Q as i64, precision, tail_cut, sigma, center);
 
     /* key generation */
     let a = random_poly();
@@ -101,10 +101,10 @@ fn random_poly() -> ZZX {
     a
 }
 
-fn random_message() -> Vec<i32> {
+fn random_message() -> Vec<i64> {
     let mut a = Vec::new();
     for _ in 0..P {
-        a.push(randombits_i64(1) as i32);
+        a.push(randombits_i64(1) as i64);
     }
     a
 }

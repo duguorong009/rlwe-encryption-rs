@@ -8,8 +8,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct EncryptionScheme {
     /* Ring parameters */
-    p: i32,
-    q: i32,
+    p: i64,
+    q: i64,
     f: ZZX,
 
     /* Knuth-Yao discrete Gaussian sampler parameters */
@@ -25,8 +25,8 @@ impl EncryptionScheme {
         // TODO: check if match c code
         // int bound = ((int)tailcut)*to_int(sigma);
         // int center = to_int(center);
-        let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as i32;
-        let center = self.center.to_f32().round() as i32;
+        let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as i64;
+        let center = self.center.to_f32().round() as i64;
 
         a.set_length(self.p as usize);
         for i in 0..self.p as usize {
@@ -46,7 +46,7 @@ impl EncryptionScheme {
 }
 
 impl EncryptionScheme {
-    pub fn new(p: i32, q: i32, preicsion: u32, tailcut: f32, sigma: Float, center: Float) -> Self {
+    pub fn new(p: i64, q: i64, preicsion: u32, tailcut: f32, sigma: Float, center: Float) -> Self {
         // RR::SetPrecision(to_long(precision));
 
         let mut f = ZZX::new();
@@ -96,7 +96,7 @@ impl EncryptionScheme {
         self._mod(p1);
     }
 
-    pub fn encode(&self, aprime: &mut ZZX, a: &[i32]) {
+    pub fn encode(&self, aprime: &mut ZZX, a: &[i64]) {
         aprime.set_length(self.p as usize);
 
         let bound = (self.q - 1) / 2;
@@ -105,7 +105,7 @@ impl EncryptionScheme {
         }
     }
 
-    pub fn decode(&self, a: &mut Vec<i32>, aprime: &ZZX) {
+    pub fn decode(&self, a: &mut Vec<i64>, aprime: &ZZX) {
         let lbound = Integer::from((self.q - 1) / 4);
         let ubound = Integer::from(3 * lbound.clone());
 
