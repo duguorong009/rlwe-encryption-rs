@@ -37,24 +37,24 @@ impl Sampling {
         let center = self.c.to_f32().round() as i64;
         let p_num_rows = self.p.len(); // precision
         let p_num_cols = self.p[0].len();
-        
+
         let mut random_bits: Vec<i64> = vec![0; p_num_rows];
-        
+
         let length = 64; // sizeof(unsigned long)*8 // 64 bits
-        
+
         let mut index = 0;
         for _ in 0..(p_num_rows / length + 1) {
             let mut r: u64 = rand::random::<u64>(); // RandomWord(); // It returns a word filled with pseudo-random bits
             let mut j = 0;
             while j < length && index < p_num_rows {
                 random_bits[index] = (r & 1) as i64; // getting the least significant bit
-                
+
                 j += 1;
                 index += 1;
                 r = r >> 1;
             }
         }
-        
+
         let mut d = 0; // distance
         let invalid_sample = bound + 1;
         let signal = 1 - 2 * randombits_i64(1) as i64; // Sample a random signal s
