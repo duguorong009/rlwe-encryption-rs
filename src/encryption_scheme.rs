@@ -8,8 +8,8 @@ use crate::{
 #[derive(Debug, Clone)]
 pub struct EncryptionScheme {
     /* Ring parameters */
-    p: i64,
-    q: i64,
+    p: i32,
+    q: i32,
     f: ZZX,
 
     /* Knuth-Yao discrete Gaussian sampler parameters */
@@ -25,8 +25,8 @@ impl EncryptionScheme {
         // TODO: check if match c code
         // int bound = ((int)tailcut)*to_int(sigma);
         // int center = to_int(center);
-        let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as i64;
-        let center = self.center.to_f32().round() as i64;
+        let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as i32;
+        let center = self.center.to_f32().round() as i32;
 
         a.set_length(self.p as usize);
         for i in 0..self.p as usize {
@@ -46,22 +46,13 @@ impl EncryptionScheme {
 }
 
 impl EncryptionScheme {
-    pub fn new(p: i64, q: i64, preicsion: u32, tailcut: f32, sigma: Float, center: Float) -> Self {
+    pub fn new(p: i32, q: i32, preicsion: u32, tailcut: f32, sigma: Float, center: Float) -> Self {
         // RR::SetPrecision(to_long(precision));
 
         let mut f = ZZX::new();
         f.set_length(p as usize + 1);
         f.set_coeff(p as usize, Some(1));
-        f.set_coeff(1, Some(-1));
-        f.set_coeff(0, Some(-1));
-
-        // f[6] = Integer::from(1);
-        // f[5] = Integer::from(1);
-        // f[4] = Integer::from(-5);
-        // f[3] = Integer::from(-4);
-        // f[2] = Integer::from(6);
-        // f[1] = Integer::from(3);
-        // f[0] = Integer::from(-1);
+        f.set_coeff(0, Some(1));
 
         let gauss = Sampling::new(preicsion, tailcut, sigma.clone(), center.clone());
 
@@ -96,7 +87,7 @@ impl EncryptionScheme {
         self._mod(p1);
     }
 
-    pub fn encode(&self, aprime: &mut ZZX, a: &[i64]) {
+    pub fn encode(&self, aprime: &mut ZZX, a: &[i32]) {
         aprime.set_length(self.p as usize);
 
         let bound = (self.q - 1) / 2;
@@ -105,7 +96,7 @@ impl EncryptionScheme {
         }
     }
 
-    pub fn decode(&self, a: &mut Vec<i64>, aprime: &ZZX) {
+    pub fn decode(&self, a: &mut Vec<i32>, aprime: &ZZX) {
         let lbound = Integer::from((self.q - 1) / 4);
         let ubound = Integer::from(3 * lbound.clone());
 

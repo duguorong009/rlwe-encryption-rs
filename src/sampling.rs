@@ -8,8 +8,8 @@ use crate::util::randombits_i64;
 
 #[derive(Debug, Clone)]
 pub struct Sampling {
-    p: Vec<Vec<i64>>,
-    begin: Vec<i64>,
+    p: Vec<Vec<i32>>,
+    begin: Vec<i32>,
     precision: u32,
     tailcut: f32,
     sigma: Float,
@@ -32,13 +32,13 @@ impl Sampling {
     }
 
     // Knuth-Yao algorithm to obtain a sample from the discrete gaussian
-    pub fn knuth_yao(&self) -> i64 {
+    pub fn knuth_yao(&self) -> i32 {
         let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as usize;
-        let center = self.c.to_f32().round() as i64;
+        let center = self.c.to_f32().round() as i32;
         let p_num_rows = self.p.len(); // precision
         let p_num_cols = self.p[0].len();
 
-        let mut random_bits: Vec<i64> = vec![0; p_num_rows];
+        let mut random_bits: Vec<i32> = vec![0; p_num_rows];
 
         let length = 64; // sizeof(unsigned long)*8 // 64 bits
 
@@ -47,7 +47,7 @@ impl Sampling {
             let mut r: u64 = rand::random::<u64>(); // RandomWord(); // It returns a word filled with pseudo-random bits
             let mut j = 0;
             while j < length && index < p_num_rows {
-                random_bits[index] = (r & 1) as i64; // getting the least significant bit
+                random_bits[index] = (r & 1) as i32; // getting the least significant bit
 
                 j += 1;
                 index += 1;
@@ -57,7 +57,7 @@ impl Sampling {
 
         let mut d = 0; // distance
         let invalid_sample = bound + 1;
-        let signal = 1 - 2 * randombits_i64(1) as i64; // Sample a random signal s
+        let signal = 1 - 2 * randombits_i64(1) as i32; // Sample a random signal s
         let mut hit = false;
 
         let mut s = 0;
@@ -70,14 +70,14 @@ impl Sampling {
 
                 // when enable & !hit becomes 1, "col" is added to "S";
                 // e.g. enable = 1 and hit = 0
-                s += select(invalid_sample as i64, col as i64, enable & !hit);
+                s += select(invalid_sample as i32, col as i32, enable & !hit);
                 hit |= enable & !hit;
             }
         }
 
         // Note: the "col" value is in [0, bound]. So, the invalid sample must be greater than bound.
-        s = s % invalid_sample as i64;
-        s = s - bound as i64 + center;
+        s = s % invalid_sample as i32;
+        s = s - bound as i32 + center;
         s *= signal;
 
         s
@@ -86,8 +86,8 @@ impl Sampling {
     fn build_probability_matrix(&mut self) {
         // RR::set_precision(to_long(self.precision));
 
-        let mut aux_p: Vec<Vec<i64>> = vec![];
-        let mut aux_begin: Vec<i64> = vec![];
+        let mut aux_p: Vec<Vec<i32>> = vec![];
+        let mut aux_begin: Vec<i32> = vec![];
 
         // The random variable consists of elements in [c-tailcut*sigma, c+tailcut*sigma]
         let mut prob_of_x: Vec<Float> = vec![];
@@ -137,11 +137,11 @@ impl Sampling {
 
         // computing in which position the non-zero values in P start and end
         for i in 0..p_num_rows {
-            aux_begin[i] = p_num_cols as i64 - 1;
+            aux_begin[i] = p_num_cols as i32 - 1;
 
             for j in 0..p_num_cols {
                 if self.p[i][j] == 1 {
-                    aux_begin[i] = j as i64;
+                    aux_begin[i] = j as i32;
                     break;
                 }
             }
@@ -170,7 +170,7 @@ impl Sampling {
     //  Method for computing the binary expansion of a given probability in [0, 1]
     fn binary_expansion(
         &self,
-        aux_p: &mut Vec<Vec<i64>>,
+        aux_p: &mut Vec<Vec<i32>>,
         mut probability: Float,
         precision: u64,
         index: usize,
@@ -179,7 +179,7 @@ impl Sampling {
         let mut j: usize = 0;
 
         while probability > 0 && ((j as u64) < precision) {
-            let pow = Float::with_val(32, 2).pow(i); // 2 ^ {i}
+            let pow = Float::with_val(self.precision, 2).pow(i); // 2 ^ {i}
             if pow <= probability {
                 aux_p[j][index] = 1;
                 probability -= pow;
@@ -193,7 +193,7 @@ impl Sampling {
 }
 
 // bit = 0 then return a
-fn select(a: i64, b: i64, bit: bool) -> i64 {
+fn select(a: i32, b: i32, bit: bool) -> i32 {
     if bit {
         b
     } else {
