@@ -101,7 +101,7 @@ impl EncryptionScheme {
         let ubound = Integer::from(3 * lbound.clone());
 
         for i in 0..self.p as usize {
-            if aprime[i] >= lbound && aprime[i] < ubound {
+            if aprime.coeff(i) >= lbound && aprime.coeff(i) < ubound {
                 a[i] = 1;
             } else {
                 a[i] = 0;
