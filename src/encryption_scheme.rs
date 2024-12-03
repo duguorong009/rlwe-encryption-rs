@@ -22,9 +22,6 @@ pub struct EncryptionScheme {
 
 impl EncryptionScheme {
     fn poly_sampling(&self, a: &mut ZZX) {
-        // TODO: check if match c code
-        // int bound = ((int)tailcut)*to_int(sigma);
-        // int center = to_int(center);
         let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as i32;
         let center = self.center.to_f32().round() as i32;
 
@@ -47,8 +44,6 @@ impl EncryptionScheme {
 
 impl EncryptionScheme {
     pub fn new(p: i32, q: i32, preicsion: u32, tailcut: f32, sigma: Float, center: Float) -> Self {
-        // RR::SetPrecision(to_long(precision));
-
         let mut f = ZZX::new();
         f.set_length(p as usize + 1);
         f.set_coeff(p as usize, Some(1));
@@ -65,10 +60,6 @@ impl EncryptionScheme {
             center,
             gauss,
         }
-    }
-
-    pub fn new_with_instance(orig: &EncryptionScheme) -> Self {
-        orig.clone()
     }
 
     pub fn key_generation(&self, a: &ZZX, r2: &mut ZZX, p1: &mut ZZX) {

@@ -1194,7 +1194,7 @@ pub fn add(x: &mut ZZX, a: &ZZX, b: &ZZX) {
         x.normalize();
         return;
     }
-    
+
     if db < 0 {
         x.coeffs = a.coeffs.clone();
         x.normalize();

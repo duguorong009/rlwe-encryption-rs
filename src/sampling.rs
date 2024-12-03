@@ -26,7 +26,6 @@ impl Sampling {
             sigma,
             c: center,
         };
-        // RR::set_precision(precision as u64);
         sampling.build_probability_matrix();
         sampling
     }
@@ -84,8 +83,6 @@ impl Sampling {
     }
 
     fn build_probability_matrix(&mut self) {
-        // RR::set_precision(to_long(self.precision));
-
         let mut aux_p: Vec<Vec<i32>> = vec![];
         let mut aux_begin: Vec<i32> = vec![];
 

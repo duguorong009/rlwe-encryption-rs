@@ -21,12 +21,12 @@ const SIGMA: f32 = 2.0;
 // const Q: usize = 4591;
 // const SIGMA: f32 = 2.0;
 
-const BENCH_LOOPS: usize = 1000;
+const BENCH_LOOPS: usize = 1;
 
 fn main() {
-    // ZZ_p::init(to_ZZ(Q));
-
-    println!("---------------------\nRing-LWE encryption scheme\n---------------------\n");
+    println!(
+        "----------------------------\nRing-LWE encryption scheme\n----------------------------\n"
+    );
 
     let precision = 256;
     let center = RR::with_val(precision, 0);
@@ -46,7 +46,7 @@ fn main() {
     for _ in 0..BENCH_LOOPS {
         let m = random_message();
 
-        println!("Message being encrypted: {:?}\n", m);
+        // println!("Message being encrypted: {:?}\n", m);
 
         // encryption
         let mut mprime = ZZX::new();
@@ -56,7 +56,7 @@ fn main() {
         let mut c2 = ZZX::new();
         es.encryption(&mut c1, &mut c2, &a, &p1, &mprime);
 
-        println!("Encrypted message: {:?}\n", c1);
+        // println!("Encrypted message: {:?}\n", c1);
 
         // decryption
         let mut moriginal = ZZX::new();
@@ -65,7 +65,7 @@ fn main() {
         let mut mdecoded = vec![0; P];
         es.decode(&mut mdecoded, &moriginal);
 
-        println!("Decrypted message: {:?}\n", mdecoded);
+        // println!("Decrypted message: {:?}\n", mdecoded);
 
         let mut counter = 0;
         for i in 0..P {
