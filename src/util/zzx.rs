@@ -1188,6 +1188,19 @@ pub fn diff(a: &ZZX) -> ZZX {
 pub fn add(x: &mut ZZX, a: &ZZX, b: &ZZX) {
     let da = a.deg();
     let db = b.deg();
+
+    if da < 0 {
+        x.coeffs = b.coeffs.clone();
+        x.normalize();
+        return;
+    }
+    
+    if db < 0 {
+        x.coeffs = a.coeffs.clone();
+        x.normalize();
+        return;
+    }
+
     let maxab = da.max(db);
 
     x.set_length((maxab + 1) as usize);
