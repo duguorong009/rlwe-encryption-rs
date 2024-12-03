@@ -63,7 +63,7 @@ fn main() {
         let mut r2 = ZZX::new();
         es.decryption(&mut moriginal, &c1, &c2, &mut r2);
 
-        let mut mdecoded = Vec::new();
+        let mut mdecoded = vec![0; P];
         es.decode(&mut mdecoded, &moriginal);
 
         println!("Decrypted message: {:?}\n", mdecoded);
