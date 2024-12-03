@@ -89,7 +89,7 @@ impl EncryptionScheme {
 
     pub fn decode(&self, a: &mut Vec<i32>, aprime: &ZZX) {
         let lbound = Integer::from((self.q - 1) / 4);
-        let ubound = Integer::from(3 * lbound.clone());
+        let ubound = 3 * lbound.clone();
 
         for i in 0..self.p as usize {
             if aprime.coeff(i) >= lbound && aprime.coeff(i) < ubound {

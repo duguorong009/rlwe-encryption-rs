@@ -50,7 +50,7 @@ impl Sampling {
 
                 j += 1;
                 index += 1;
-                r = r >> 1;
+                r >>= 1;
             }
         }
 
@@ -63,7 +63,7 @@ impl Sampling {
         for row in 0..p_num_rows {
             d = 2 * d + random_bits[row]; // Distance calculus
             for col in self.begin[row] as usize..p_num_cols {
-                d = d - self.p[row][col];
+                d -= self.p[row][col];
 
                 let enable = d == -1;
 
@@ -75,8 +75,8 @@ impl Sampling {
         }
 
         // Note: the "col" value is in [0, bound]. So, the invalid sample must be greater than bound.
-        s = s % invalid_sample as i32;
-        s = s - bound as i32 + center;
+        s %= invalid_sample as i32;
+        s -= bound as i32 + center;
         s *= signal;
 
         s
@@ -91,7 +91,7 @@ impl Sampling {
 
         let bound = (self.tailcut * self.sigma.clone().to_f32()).round() as usize;
         prob_of_x.resize_with(bound + 1, || Float::with_val(self.precision, 0));
-        aux_p.resize_with(self.precision as usize, || vec![]);
+        aux_p.resize_with(self.precision as usize, Vec::new);
 
         for i in 0..aux_p.len() {
             aux_p[i].resize_with(bound + 1, || 0);

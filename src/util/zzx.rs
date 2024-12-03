@@ -372,7 +372,7 @@ pub fn rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     }
 }
 
-fn const_rem(r: &mut ZZX, a: &ZZX, b: &Integer) {
+fn const_rem(r: &mut ZZX, _a: &ZZX, b: &Integer) {
     if b == &0 {
         panic!("const_rem: division by zero");
     }
@@ -488,9 +488,8 @@ fn div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
     } else {
         let mut q1 = ZZX::new();
         let mut r1 = ZZX::new();
-        let mut m = Integer::new();
         pseudo_div_rem(&mut q1, &mut r1, a, b);
-        m = b.lead_coeff().pow((da - db + 1) as u32);
+        let m = b.lead_coeff().pow((da - db + 1) as u32);
         if !divide_with_integer(q, &q1, &m) {
             panic!("div_rem: quotient not defined over ZZ");
         }
@@ -533,9 +532,8 @@ fn div(q: &mut ZZX, a: &ZZX, b: &ZZX) {
         // nothing to do
     } else {
         let mut q1 = ZZX::new();
-        let mut m = Integer::new();
         pseudo_div(&mut q1, a, b);
-        m = b.lead_coeff().pow((da - db + 1) as u32);
+        let m = b.lead_coeff().pow((da - db + 1) as u32);
         if !divide_with_integer(q, &q1, &m) {
             panic!("div: quotient not defined over ZZ");
         }
@@ -613,8 +611,8 @@ impl Rem<Integer> for ZZX {
 
 // if b | a, sets q = a / b and returns true; otherwise returns false
 fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
-    let da = a.deg();
-    let db = b.deg();
+    // let da = a.deg();
+    // let db = b.deg();
 
     // if db <= 8 || da - db <= 8 {
     //     plain_divide(q, a, b)
@@ -760,7 +758,7 @@ fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
     let n = a.coeffs.len();
     let mut res = vec![Integer::from(0); n];
     for i in 0..n {
-        let (q, r) = &a.coeffs[i].div_rem_ref(&b).complete();
+        let (q, r) = &a.coeffs[i].div_rem_ref(b).complete();
         if !r.is_zero() {
             return false;
         }
@@ -954,9 +952,9 @@ fn _sqr(c: &mut ZZX, a: &ZZX) {
         return;
     }
 
-    let maxa = a.max_size();
-    let k = maxa;
-    let s = a.deg() + 1;
+    // let maxa = a.max_size();
+    // let k = maxa;
+    // let s = a.deg() + 1;
 
     // if s == 1 || (k == 1 && s < 50) || (k == 2 && s < 25) || (k == 3 && s < 25) || (k == 4 && s < 10) {
     //     plain_sqr(c, a);

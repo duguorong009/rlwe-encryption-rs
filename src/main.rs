@@ -21,7 +21,7 @@ const SIGMA: f32 = 2.0;
 // const Q: usize = 4591;
 // const SIGMA: f32 = 2.0;
 
-const BENCH_LOOPS: usize = 1;
+const BENCH_LOOPS: usize = 10;
 
 fn main() {
     println!(
