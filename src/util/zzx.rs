@@ -125,11 +125,11 @@ impl ZZX {
         T: Into<Integer>,
     {
         let m = self.deg();
-        if i > m as usize && self.is_zero() {
+        if i as i64 > m && self.is_zero() {
             return;
         }
 
-        if i > m as usize {
+        if i as i64 > m {
             self.set_length(i + 1);
         }
         self.coeffs[i] = n.map(Into::into).unwrap_or(Integer::from(1));
