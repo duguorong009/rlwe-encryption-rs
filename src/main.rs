@@ -60,8 +60,7 @@ fn main() {
 
         // decryption
         let mut moriginal = ZZX::new();
-        let mut r2 = ZZX::new();
-        es.decryption(&mut moriginal, &c1, &c2, &mut r2);
+        es.decryption(&mut moriginal, &c1, &c2, &r2);
 
         let mut mdecoded = vec![0; P];
         es.decode(&mut mdecoded, &moriginal);
