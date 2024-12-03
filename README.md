@@ -1,9 +1,7 @@
-# Ring-LWE Encryption Scheme  
+# RLWE Encryption Scheme  
 This repo is for implementing this encryption scheme(https://eprint.iacr.org/2014/725.pdf) with Rustlang.  
 
 Inspired by [this work](https://github.com/jnortiz/RLWE).  
-
-**NOTE**: Currently, the code sometimes crashes. Needs debugging on "ZZX" implementation.  
 
 **IMPORTANT**: For testing, we should use the `cargo r --release` command.  
 The reason is that there is overflow of `i32` in `knuth-yao` sampling code.  
