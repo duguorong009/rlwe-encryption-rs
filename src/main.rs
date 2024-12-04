@@ -74,7 +74,7 @@ fn main() {
                 counter += 1;
             }
         }
-        println!("Number of incorrect decodings: {}\n", counter);
+        // println!("Number of incorrect decodings: {}\n", counter);
         if counter > 0 {
             total_errors += 1;
         }
