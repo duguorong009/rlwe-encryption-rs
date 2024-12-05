@@ -625,14 +625,16 @@ fn divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
 }
 
 fn divide_(a: &ZZX, b: &ZZX) -> bool {
-    let da = a.deg();
-    let db = b.deg();
+    // let da = a.deg();
+    // let db = b.deg();
 
-    if db <= 8 || da - db <= 8 {
-        plain_divide_(a, b)
-    } else {
-        hom_divide_(a, b)
-    }
+    // if db <= 8 || da - db <= 8 {
+    //     plain_divide_(a, b)
+    // } else {
+    //     hom_divide_(a, b)
+    // }
+
+    plain_divide_(a, b)
 }
 
 fn plain_divide(qq: &mut ZZX, aa: &ZZX, bb: &ZZX) -> bool {
@@ -802,63 +804,63 @@ fn mul_with_integer(x: &mut ZZX, a: &ZZX, b: &Integer) {
     }
 }
 
-fn hom_divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
-    if b.is_zero() {
-        if a.is_zero() {
-            q.clear();
-            return true; // 1
-        } else {
-            return false; // 0
-        }
-    }
+// fn hom_divide(q: &mut ZZX, a: &ZZX, b: &ZZX) -> bool {
+//     if b.is_zero() {
+//         if a.is_zero() {
+//             q.clear();
+//             return true; // 1
+//         } else {
+//             return false; // 0
+//         }
+//     }
 
-    if a.is_zero() {
-        q.clear();
-        return true; // 1
-    }
+//     if a.is_zero() {
+//         q.clear();
+//         return true; // 1
+//     }
 
-    if b.deg() == 0 {
-        return divide_with_integer(q, a, &b.const_term());
-    }
+//     if b.deg() == 0 {
+//         return divide_with_integer(q, a, &b.const_term());
+//     }
 
-    if a.deg() < b.deg() {
-        return false; // 0
-    }
+//     if a.deg() < b.deg() {
+//         return false; // 0
+//     }
 
-    let mut ca = Integer::new();
-    let mut cb = Integer::new();
-    _content(&mut ca, a);
-    _content(&mut cb, b);
+//     let mut ca = Integer::new();
+//     let mut cb = Integer::new();
+//     _content(&mut ca, a);
+//     _content(&mut cb, b);
 
-    let (_, r) = ca.div_rem_ref(&cb).complete();
-    if !r.is_zero() {
-        return false; // 0
-    }
+//     let (_, r) = ca.div_rem_ref(&cb).complete();
+//     if !r.is_zero() {
+//         return false; // 0
+//     }
 
-    let mut aa = ZZX::new();
-    let mut bb = ZZX::new();
-    divide_with_integer(&mut aa, a, &ca);
-    divide_with_integer(&mut bb, b, &cb);
+//     let mut aa = ZZX::new();
+//     let mut bb = ZZX::new();
+//     divide_with_integer(&mut aa, a, &ca);
+//     divide_with_integer(&mut bb, b, &cb);
 
-    if !aa.lead_coeff().is_divisible(&bb.lead_coeff()) {
-        return false; // 0
-    }
+//     if !aa.lead_coeff().is_divisible(&bb.lead_coeff()) {
+//         return false; // 0
+//     }
 
-    if !aa.const_term().is_divisible(&bb.const_term()) {
-        return false; // 0
-    }
+//     if !aa.const_term().is_divisible(&bb.const_term()) {
+//         return false; // 0
+//     }
 
-    todo!()
-}
+//     todo!()
+// }
 
-fn hom_divide_(a: &ZZX, b: &ZZX) -> bool {
-    if b.deg() == 0 {
-        divide_with_integer_(a, &b.const_term())
-    } else {
-        let mut q = ZZX::new();
-        hom_divide(&mut q, a, b)
-    }
-}
+// fn hom_divide_(a: &ZZX, b: &ZZX) -> bool {
+//     if b.deg() == 0 {
+//         divide_with_integer_(a, &b.const_term())
+//     } else {
+//         let mut q = ZZX::new();
+//         hom_divide(&mut q, a, b)
+//     }
+// }
 
 /// c = content of f, sign(c) = sign(f.lead_coeff())
 fn _content(c: &mut Integer, f: &ZZX) {
@@ -898,52 +900,52 @@ pub fn primitive_part(f: &ZZX) -> ZZX {
     pp
 }
 
-/// d = gcd(a, b), d.lead_coeff() >= 0
-fn _gcd(d: &mut ZZX, a: &ZZX, b: &ZZX) {
-    if a.is_zero() {
-        d.coeffs = b.coeffs.clone();
-        if d.lead_coeff().is_negative() {
-            let temp = d.clone();
-            negate(d, &temp);
-        }
-        return;
-    }
+// /// d = gcd(a, b), d.lead_coeff() >= 0
+// fn _gcd(d: &mut ZZX, a: &ZZX, b: &ZZX) {
+//     if a.is_zero() {
+//         d.coeffs = b.coeffs.clone();
+//         if d.lead_coeff().is_negative() {
+//             let temp = d.clone();
+//             negate(d, &temp);
+//         }
+//         return;
+//     }
 
-    if b.is_zero() {
-        d.coeffs = a.coeffs.clone();
-        if d.lead_coeff().is_negative() {
-            let temp = d.clone();
-            negate(d, &temp);
-        }
-        return;
-    }
+//     if b.is_zero() {
+//         d.coeffs = a.coeffs.clone();
+//         if d.lead_coeff().is_negative() {
+//             let temp = d.clone();
+//             negate(d, &temp);
+//         }
+//         return;
+//     }
 
-    let mut c1 = Integer::new();
-    let mut c2 = Integer::new();
+//     let mut c1 = Integer::new();
+//     let mut c2 = Integer::new();
 
-    let mut f1 = ZZX::new();
-    let mut f2 = ZZX::new();
+//     let mut f1 = ZZX::new();
+//     let mut f2 = ZZX::new();
 
-    _content(&mut c1, a);
-    divide_with_integer(&mut f1, a, &c1);
+//     _content(&mut c1, a);
+//     divide_with_integer(&mut f1, a, &c1);
 
-    _content(&mut c2, b);
-    divide_with_integer(&mut f2, b, &c2);
+//     _content(&mut c2, b);
+//     divide_with_integer(&mut f2, b, &c2);
 
-    let c = &c1.gcd_ref(&c2).complete();
+//     let c = &c1.gcd_ref(&c2).complete();
 
-    let ld = f1.lead_coeff().gcd(&f2.lead_coeff());
+//     let ld = f1.lead_coeff().gcd(&f2.lead_coeff());
 
-    let prod = Integer::from(1);
+//     let prod = Integer::from(1);
 
-    todo!()
-}
+//     todo!()
+// }
 
-pub fn gcd(a: &ZZX, b: &ZZX) -> ZZX {
-    let mut d = ZZX::new();
-    _gcd(&mut d, a, b);
-    d
-}
+// pub fn gcd(a: &ZZX, b: &ZZX) -> ZZX {
+//     let mut d = ZZX::new();
+//     _gcd(&mut d, a, b);
+//     d
+// }
 
 /// x = a ^ 2
 fn _sqr(c: &mut ZZX, a: &ZZX) {
