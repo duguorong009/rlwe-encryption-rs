@@ -227,20 +227,20 @@ pub fn mulmod(a: &ZZX, b: &ZZX, f: &ZZX) -> ZZX {
     x
 }
 
-fn _sqrmod(x: &mut ZZX, a: &ZZX, f: &ZZX) {
-    if a.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != 1 {
-        panic!("SqrMod: bad args");
-    }
-    let mut t = ZZX::new();
-    _sqr(&mut t, a);
-    rem(x, &t, f);
-}
+// fn _sqrmod(x: &mut ZZX, a: &ZZX, f: &ZZX) {
+//     if a.deg() >= f.deg() || f.deg() == 0 || f.lead_coeff() != 1 {
+//         panic!("SqrMod: bad args");
+//     }
+//     let mut t = ZZX::new();
+//     _sqr(&mut t, a);
+//     rem(x, &t, f);
+// }
 
-pub fn sqrmod(a: &ZZX, f: &ZZX) -> ZZX {
-    let mut x = ZZX::new();
-    _sqrmod(&mut x, a, f);
-    x
-}
+// pub fn sqrmod(a: &ZZX, f: &ZZX) -> ZZX {
+//     let mut x = ZZX::new();
+//     _sqrmod(&mut x, a, f);
+//     x
+// }
 
 fn _mulbyxmod_aux(h: &mut ZZX, a: &ZZX, f: &ZZX) {
     let n = f.deg();
@@ -273,15 +273,15 @@ fn _mulbyxmod_aux(h: &mut ZZX, a: &ZZX, f: &ZZX) {
     }
 }
 
-fn _mulbyxmod(h: &mut ZZX, a: &ZZX, f: &ZZX) {
-    _mulbyxmod_aux(h, a, f);
-}
+// fn _mulbyxmod(h: &mut ZZX, a: &ZZX, f: &ZZX) {
+//     _mulbyxmod_aux(h, a, f);
+// }
 
-pub fn mulbyxmod(a: &ZZX, f: &ZZX) -> ZZX {
-    let mut x = ZZX::new();
-    _mulbyxmod(&mut x, a, f);
-    x
-}
+// pub fn mulbyxmod(a: &ZZX, f: &ZZX) -> ZZX {
+//     let mut x = ZZX::new();
+//     _mulbyxmod(&mut x, a, f);
+//     x
+// }
 
 /// x = a * b
 pub fn mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
@@ -459,55 +459,55 @@ fn pseudo_rem(r: &mut ZZX, a: &ZZX, b: &ZZX) {
     plain_pseudo_rem(r, a, b);
 }
 
-fn pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
-    plain_pseudo_div_rem(q, r, a, b);
-}
+// fn pseudo_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
+//     plain_pseudo_div_rem(q, r, a, b);
+// }
 
-fn div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
-    let da = a.deg();
-    let db = b.deg();
+// fn div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &ZZX) {
+//     let da = a.deg();
+//     let db = b.deg();
 
-    if db < 0 {
-        panic!("div_rem: division by zero");
-    }
+//     if db < 0 {
+//         panic!("div_rem: division by zero");
+//     }
 
-    if da < db {
-        r.coeffs = a.coeffs.clone();
-        q.clear();
-    } else if db == 0 {
-        const_div_rem(q, r, a, &b.const_term());
-    } else if b.lead_coeff() == 1 {
-        pseudo_div_rem(q, r, a, b);
-    } else if b.lead_coeff() == -1 {
-        let mut b1 = ZZX::new();
-        negate(&mut b1, b);
-        pseudo_div_rem(q, r, a, &b1);
-        negate(q, &q.clone());
-    } else if divide(q, a, b) {
-        r.clear();
-    } else {
-        let mut q1 = ZZX::new();
-        let mut r1 = ZZX::new();
-        pseudo_div_rem(&mut q1, &mut r1, a, b);
-        let m = b.lead_coeff().pow((da - db + 1) as u32);
-        if !divide_with_integer(q, &q1, &m) {
-            panic!("div_rem: quotient not defined over ZZ");
-        }
-        if !divide_with_integer(r, &r1, &m) {
-            panic!("div_rem: remainder not defined over ZZ");
-        }
-    }
-}
+//     if da < db {
+//         r.coeffs = a.coeffs.clone();
+//         q.clear();
+//     } else if db == 0 {
+//         const_div_rem(q, r, a, &b.const_term());
+//     } else if b.lead_coeff() == 1 {
+//         pseudo_div_rem(q, r, a, b);
+//     } else if b.lead_coeff() == -1 {
+//         let mut b1 = ZZX::new();
+//         negate(&mut b1, b);
+//         pseudo_div_rem(q, r, a, &b1);
+//         negate(q, &q.clone());
+//     } else if divide(q, a, b) {
+//         r.clear();
+//     } else {
+//         let mut q1 = ZZX::new();
+//         let mut r1 = ZZX::new();
+//         pseudo_div_rem(&mut q1, &mut r1, a, b);
+//         let m = b.lead_coeff().pow((da - db + 1) as u32);
+//         if !divide_with_integer(q, &q1, &m) {
+//             panic!("div_rem: quotient not defined over ZZ");
+//         }
+//         if !divide_with_integer(r, &r1, &m) {
+//             panic!("div_rem: remainder not defined over ZZ");
+//         }
+//     }
+// }
 
-fn const_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &Integer) {
-    if b == &0 {
-        panic!("const_div_rem: division by zero");
-    }
-    if !divide_with_integer(q, a, b) {
-        panic!("const_div_rem: quotient not defined over ZZ");
-    }
-    r.clear();
-}
+// fn const_div_rem(q: &mut ZZX, r: &mut ZZX, a: &ZZX, b: &Integer) {
+//     if b == &0 {
+//         panic!("const_div_rem: division by zero");
+//     }
+//     if !divide_with_integer(q, a, b) {
+//         panic!("const_div_rem: quotient not defined over ZZ");
+//     }
+//     r.clear();
+// }
 
 fn div(q: &mut ZZX, a: &ZZX, b: &ZZX) {
     let da = a.deg();
@@ -771,23 +771,23 @@ fn divide_with_integer(q: &mut ZZX, a: &ZZX, b: &Integer) -> bool {
     true
 }
 
-fn divide_with_integer_(a: &ZZX, b: &Integer) -> bool {
-    if b == &0 {
-        return a.is_zero();
-    }
-    if b == &1 || b == &-1 {
-        return true;
-    }
+// fn divide_with_integer_(a: &ZZX, b: &Integer) -> bool {
+//     if b == &0 {
+//         return a.is_zero();
+//     }
+//     if b == &1 || b == &-1 {
+//         return true;
+//     }
 
-    let n = a.coeffs.len();
-    for i in 0..n {
-        if !a.coeffs[i].is_divisible(b) {
-            return false;
-        }
-    }
+//     let n = a.coeffs.len();
+//     for i in 0..n {
+//         if !a.coeffs[i].is_divisible(b) {
+//             return false;
+//         }
+//     }
 
-    true
-}
+//     true
+// }
 
 fn mul_with_integer(x: &mut ZZX, a: &ZZX, b: &Integer) {
     if b == &0 {
@@ -894,11 +894,11 @@ fn _primitive_part(pp: &mut ZZX, f: &ZZX) {
     divide_with_integer(pp, f, &d);
 }
 
-pub fn primitive_part(f: &ZZX) -> ZZX {
-    let mut pp = ZZX::new();
-    _primitive_part(&mut pp, f);
-    pp
-}
+// pub fn primitive_part(f: &ZZX) -> ZZX {
+//     let mut pp = ZZX::new();
+//     _primitive_part(&mut pp, f);
+//     pp
+// }
 
 // /// d = gcd(a, b), d.lead_coeff() >= 0
 // fn _gcd(d: &mut ZZX, a: &ZZX, b: &ZZX) {
@@ -972,12 +972,12 @@ fn _sqr(c: &mut ZZX, a: &ZZX) {
     plain_sqr(c, a);
 }
 
-/// x = a ^ 2
-pub fn sqr(a: &ZZX) -> ZZX {
-    let mut c = ZZX::new();
-    _sqr(&mut c, a);
-    c
-}
+// /// x = a ^ 2
+// pub fn sqr(a: &ZZX) -> ZZX {
+//     let mut c = ZZX::new();
+//     _sqr(&mut c, a);
+//     c
+// }
 
 fn plain_mul(c: &mut ZZX, a: &ZZX, b: &ZZX) {
     if a == b {
@@ -1179,11 +1179,11 @@ fn _diff(x: &mut ZZX, a: &ZZX) {
     x.normalize();
 }
 
-pub fn diff(a: &ZZX) -> ZZX {
-    let mut x = ZZX::new();
-    _diff(&mut x, a);
-    x
-}
+// pub fn diff(a: &ZZX) -> ZZX {
+//     let mut x = ZZX::new();
+//     _diff(&mut x, a);
+//     x
+// }
 
 pub fn add(x: &mut ZZX, a: &ZZX, b: &ZZX) {
     let da = a.deg();
@@ -1395,11 +1395,11 @@ fn _inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
     newton_inv_trunc(c, a, e);
 }
 
-pub fn inv_trunc(a: &ZZX, e: i64) -> ZZX {
-    let mut x = ZZX::new();
-    _inv_trunc(&mut x, a, e);
-    x
-}
+// pub fn inv_trunc(a: &ZZX, e: i64) -> ZZX {
+//     let mut x = ZZX::new();
+//     _inv_trunc(&mut x, a, e);
+//     x
+// }
 
 fn newton_inv_trunc(c: &mut ZZX, a: &ZZX, e: i64) {
     let x = if a.const_term() == 1 {
@@ -1563,23 +1563,23 @@ pub fn trace_vec(f: &ZZX) -> Vec<Integer> {
     s
 }
 
-/// res = trace of (a mod f)
-/// f must be monic
-fn _trace_mod(res: &mut Integer, a: &ZZX, f: &ZZX) {
-    if f.lead_coeff() != 1 || a.deg() >= f.deg() || f.deg() <= 0 {
-        panic!("TraceMod: bad args");
-    }
+// /// res = trace of (a mod f)
+// /// f must be monic
+// fn _trace_mod(res: &mut Integer, a: &ZZX, f: &ZZX) {
+//     if f.lead_coeff() != 1 || a.deg() >= f.deg() || f.deg() <= 0 {
+//         panic!("TraceMod: bad args");
+//     }
 
-    let mut s = Vec::new();
-    _trace_vec(&mut s, f);
-    _inner_product(res, &s, &a.coeffs);
-}
+//     let mut s = Vec::new();
+//     _trace_vec(&mut s, f);
+//     _inner_product(res, &s, &a.coeffs);
+// }
 
-fn trace_mod(a: &ZZX, f: &ZZX) -> Integer {
-    let mut res = Integer::from(0);
-    _trace_mod(&mut res, a, f);
-    res
-}
+// fn trace_mod(a: &ZZX, f: &ZZX) -> Integer {
+//     let mut res = Integer::from(0);
+//     _trace_mod(&mut res, a, f);
+//     res
+// }
 
 fn _inner_product(res: &mut Integer, a: &[Integer], b: &[Integer]) {
     let n = a.len().min(b.len());
