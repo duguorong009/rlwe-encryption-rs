@@ -1,3 +1,4 @@
+#![allow(warnings)]
 use std::ops::{
     Add, AddAssign, Div, Index, IndexMut, Mul, MulAssign, Neg, Rem, Shl, ShlAssign, Shr, ShrAssign,
     Sub, SubAssign,
