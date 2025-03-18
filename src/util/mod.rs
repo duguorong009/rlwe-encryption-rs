@@ -7,8 +7,8 @@ pub fn randombits_u64(bits: u32) -> u64 {
     assert!(bits > 0 && bits <= 64, "Bits must be between 1 and 64");
 
     // Generate a random u64
-    let mut rng = rand::thread_rng();
-    let random_value: u64 = rng.gen::<u64>();
+    let mut rng = rand::rng();
+    let random_value: u64 = rng.random::<u64>();
 
     // Mask the result to ensure it fits within the specified number of bits
     let mask = if bits == 64 {
@@ -24,8 +24,8 @@ pub fn randombits_i64(bits: u32) -> i64 {
     assert!(bits > 0 && bits <= 64, "Bits must be between 1 and 64");
 
     // Generate a random u64
-    let mut rng = rand::thread_rng();
-    let random_value: i64 = rng.gen::<i64>();
+    let mut rng = rand::rng();
+    let random_value: i64 = rng.random::<i64>();
 
     // Mask the result to ensure it fits within the specified number of bits
     let mask = if bits == 64 {
