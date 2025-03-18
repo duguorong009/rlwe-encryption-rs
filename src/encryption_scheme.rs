@@ -87,7 +87,7 @@ impl EncryptionScheme {
         }
     }
 
-    pub fn decode(&self, a: &mut Vec<i32>, aprime: &ZZX) {
+    pub fn decode(&self, a: &mut [i32], aprime: &ZZX) {
         let lbound = Integer::from((self.q - 1) / 4);
         let ubound = 3 * lbound.clone();
 
