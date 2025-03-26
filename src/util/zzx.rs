@@ -635,6 +635,7 @@ fn divide_(a: &ZZX, b: &ZZX) -> bool {
     //     hom_divide_(a, b)
     // }
 
+    // TODO: uncomment the above.
     plain_divide_(a, b)
 }
 
