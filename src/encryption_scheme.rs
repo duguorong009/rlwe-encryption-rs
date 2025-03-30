@@ -91,11 +91,11 @@ impl EncryptionScheme {
         let lbound = Integer::from((self.q - 1) / 4);
         let ubound = 3 * lbound.clone();
 
-        for i in 0..self.p as usize {
+        for (i, a_i) in a.iter_mut().enumerate().take(self.p as usize) {
             if aprime.coeff(i) >= lbound && aprime.coeff(i) < ubound {
-                a[i] = 1;
+                *a_i = 1;
             } else {
-                a[i] = 0;
+                *a_i = 0;
             }
         }
     }

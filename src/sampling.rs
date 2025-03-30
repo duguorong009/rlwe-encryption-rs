@@ -93,8 +93,8 @@ impl Sampling {
         prob_of_x.resize_with(bound + 1, || Float::with_val(self.precision, 0));
         aux_p.resize_with(self.precision as usize, Vec::new);
 
-        for i in 0..aux_p.len() {
-            aux_p[i].resize_with(bound + 1, || 0);
+        for aux_p_i in &mut aux_p {
+            aux_p_i.resize_with(bound + 1, || 0);
         }
 
         for x in (1..=bound).rev() {
