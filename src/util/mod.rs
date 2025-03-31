@@ -3,7 +3,7 @@ pub mod zzx;
 use rand::Rng;
 
 /// Equivalent to `NTL::RandomBits_ulong`
-pub fn randombits_u64(bits: u32) -> u64 {
+pub fn randombits_u64(bits: u8) -> u64 {
     assert!(bits > 0 && bits <= 64, "Bits must be between 1 and 64");
 
     // Generate a random u64
@@ -20,7 +20,7 @@ pub fn randombits_u64(bits: u32) -> u64 {
 }
 
 /// Equivalent to `NTL::RandomBits_long`
-pub fn randombits_i64(bits: u32) -> i64 {
+pub fn randombits_i64(bits: u8) -> i64 {
     assert!(bits > 0 && bits <= 64, "Bits must be between 1 and 64");
 
     // Generate a random u64

@@ -95,7 +95,7 @@ fn random_poly() -> ZZX {
     let mut a = ZZX::new();
     a.set_length(P);
     for i in 0..P {
-        a[i] = randombits_u64(((Q as f64).log2() as u32) / 4).into();
+        a[i] = randombits_u64(((Q as f64).log2() as u8) / 4).into();
     }
     a
 }
